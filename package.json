@@ -1,0 +1,14 @@
+{
+  "name": "clinicaos",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "db:migrate": "cd packages/database && yarn prisma migrate dev",
+    "db:studio": "cd packages/database && yarn prisma studio"
+  },
+  "devDependencies": {
+    "turbo": "latest"
+  }
+}

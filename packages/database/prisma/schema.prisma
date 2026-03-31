@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Clinic {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  phone     String?
+  address   String?
+  createdAt DateTime @default(now())
+
+  users        User[]
+  doctors      Doctor[]
+  patients     Patient[]
+  appointments Appointment[]
+  payments     Payment[]
+}
+
+model User {
+  id        String   @id @default(cuid())
+  clinicId  String
+  email     String
+  password  String
+  role      Role     @default(RECEPTIONIST)
+  name      String
+  createdAt DateTime @default(now())
+
+  clinic    Clinic   @relation(fields: [clinicId], references: [id])
+
+  @@unique([email, clinicId])
+}
+
+enum Role {
+  ADMIN
+  DOCTOR
+  RECEPTIONIST
+}
+
+model Doctor {
+  id        String  @id @default(cuid())
+  clinicId  String
+  name      String
+  crm       String?
+  specialty String?
+  color     String  @default("#3B82F6")
+
+  clinic       Clinic        @relation(fields: [clinicId], references: [id])
+  appointments Appointment[]
+  schedules    Schedule[]
+
+  @@unique([crm, clinicId])
+}
+
+model Schedule {
+  id        String @id @default(cuid())
+  doctorId  String
+  dayOfWeek Int
+  startTime String
+  endTime   String
+  slotMins  Int    @default(30)
+
+  doctor    Doctor @relation(fields: [doctorId], references: [id])
+}
+
+model Patient {
+  id        String    @id @default(cuid())
+  clinicId  String
+  name      String
+  email     String?
+  phone     String?
+  cpf       String?
+  birthDate DateTime?
+  notes     String?
+  createdAt DateTime  @default(now())
+
+  clinic       Clinic          @relation(fields: [clinicId], references: [id])
+  appointments Appointment[]
+  records      MedicalRecord[]
+
+  @@unique([cpf, clinicId])
+}
+
+model Appointment {
+  id        String            @id @default(cuid())
+  clinicId  String
+  doctorId  String
+  patientId String
+  startsAt  DateTime
+  endsAt    DateTime
+  status    AppointmentStatus @default(SCHEDULED)
+  notes     String?
+  createdAt DateTime          @default(now())
+
+  clinic    Clinic    @relation(fields: [clinicId], references: [id])
+  doctor    Doctor    @relation(fields: [doctorId], references: [id])
+  patient   Patient   @relation(fields: [patientId], references: [id])
+  payment   Payment?
+  reminders Reminder[]
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  CANCELLED
+  NO_SHOW
+  DONE
+}
+
+model MedicalRecord {
+  id            String   @id @default(cuid())
+  patientId     String
+  appointmentId String?
+  content       String
+  createdAt     DateTime @default(now())
+
+  patient       Patient  @relation(fields: [patientId], references: [id])
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  clinicId      String
+  appointmentId String        @unique
+  amount        Decimal
+  method        PaymentMethod @default(PIX)
+  status        PaymentStatus @default(PENDING)
+  paidAt        DateTime?
+  createdAt     DateTime      @default(now())
+
+  clinic        Clinic      @relation(fields: [clinicId], references: [id])
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+}
+
+enum PaymentMethod {
+  PIX
+  CASH
+  CREDIT_CARD
+  HEALTH_INSURANCE
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  REFUNDED
+}
+
+model Reminder {
+  id            String          @id @default(cuid())
+  appointmentId String
+  channel       ReminderChannel
+  sentAt        DateTime?
+  status        ReminderStatus  @default(PENDING)
+
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+}
+
+enum ReminderChannel {
+  WHATSAPP
+  EMAIL
+}
+
+enum ReminderStatus {
+  PENDING
+  SENT
+  FAILED
+}
