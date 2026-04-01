@@ -77,6 +77,11 @@ export default function AgendamentosPage() {
     duration: '30',
     notes: '',
   })
+  const [showPaymentForm, setShowPaymentForm] = useState(false)
+  const [paymentForm, setPaymentForm] = useState({
+    amount: '',
+    method: 'PIX',
+  })
 
   const weekStart = startOfWeek(currentWeek, { weekStartsOn: 1 })
   const weekEnd = endOfWeek(currentWeek, { weekStartsOn: 1 })
@@ -152,6 +157,25 @@ export default function AgendamentosPage() {
       loadData()
     } catch {
       toast.error('Erro ao remover agendamento')
+    }
+  }
+
+  async function handleCreatePayment(e: React.FormEvent) {
+    e.preventDefault()
+    if (!selectedAppointment) return
+    try {
+      await api.post('/payments', {
+        appointmentId: selectedAppointment.id,
+        amount: Number(paymentForm.amount),
+        method: paymentForm.method,
+      })
+      toast.success('Cobrança gerada!')
+      setShowPaymentForm(false)
+      setSelectedAppointment(null)
+      setPaymentForm({ amount: '', method: 'PIX' })
+    } catch (err) {
+      const error = err as { response?: { data?: { error?: string } } }
+      toast.error(error.response?.data?.error || 'Erro ao gerar cobrança')
     }
   }
 
@@ -289,17 +313,26 @@ export default function AgendamentosPage() {
               </div>
             </div>
             <div className="flex flex-wrap gap-2 pt-2">
-              {Object.keys(STATUS_LABELS).map((status) => (
-                <Button
-                  key={status}
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleStatusChange(selectedAppointment.id, status)}
-                  disabled={selectedAppointment.status === status}
-                >
-                  {STATUS_LABELS[status]}
-                </Button>
-              ))}
+            {Object.keys(STATUS_LABELS).map((status) => (
+              <Button
+                key={status}
+                size="sm"
+                variant="outline"
+                onClick={() => handleStatusChange(selectedAppointment.id, status)}
+                disabled={selectedAppointment.status === status}
+              >
+                {STATUS_LABELS[status]}
+              </Button>
+            ))}
+            {selectedAppointment.status === 'DONE' && (
+              <Button
+                size="sm"
+                className="bg-green-600 hover:bg-green-700 text-white"
+                onClick={() => setShowPaymentForm(true)}
+              >
+                Gerar cobrança
+              </Button>
+            )}
               <Button
                 size="sm"
                 variant="outline"
@@ -316,6 +349,52 @@ export default function AgendamentosPage() {
                 Fechar
               </Button>
             </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {showPaymentForm && selectedAppointment && (
+        <Card className="border-green-200">
+          <CardHeader>
+            <CardTitle className="text-base">Gerar cobrança</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleCreatePayment} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Valor (R$)</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    placeholder="150.00"
+                    value={paymentForm.amount}
+                    onChange={(e) => setPaymentForm({ ...paymentForm, amount: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Forma de pagamento</Label>
+                  <select
+                    value={paymentForm.method}
+                    onChange={(e) => setPaymentForm({ ...paymentForm, method: e.target.value })}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  >
+                    <option value="PIX">PIX</option>
+                    <option value="CASH">Dinheiro</option>
+                    <option value="CREDIT_CARD">Cartão de crédito</option>
+                    <option value="HEALTH_INSURANCE">Convênio</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button type="submit" className="bg-green-600 hover:bg-green-700 text-white">
+                  Confirmar cobrança
+                </Button>
+                <Button type="button" variant="outline" onClick={() => setShowPaymentForm(false)}>
+                  Cancelar
+                </Button>
+              </div>
+            </form>
           </CardContent>
         </Card>
       )}
