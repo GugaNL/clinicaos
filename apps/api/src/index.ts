@@ -6,6 +6,7 @@ import { doctorRoutes } from './routes/doctors'
 import { patientRoutes } from './routes/patients'
 import { appointmentRoutes } from './routes/appointments'
 import { dashboardRoutes } from './routes/dashboard'
+import { recordRoutes } from './routes/records'
 
 const app = Fastify({ logger: true })
 
@@ -22,6 +23,7 @@ app.register(doctorRoutes, { prefix: '/doctors' })
 app.register(patientRoutes, { prefix: '/patients' })
 app.register(appointmentRoutes, { prefix: '/appointments' })
 app.register(dashboardRoutes, { prefix: '/dashboard' })
+app.register(recordRoutes, { prefix: '/records' })
 
 app.get('/health', async () => {
   return { status: 'ok' }

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { api } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -25,6 +26,7 @@ export default function PacientesPage() {
   const [showForm, setShowForm] = useState(false)
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null)
   const [search, setSearch] = useState('')
+  const router = useRouter()
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -290,6 +292,13 @@ export default function PacientesPage() {
                   <td className="px-4 py-3 text-sm text-slate-600">{patient.email || '—'}</td>
                   <td className="px-4 py-3">
                     <div className="flex gap-2 justify-end">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => router.push(`/pacientes/${patient.id}`)}
+                      >
+                        Prontuário
+                      </Button>
                       <Button variant="outline" size="sm" onClick={() => openEdit(patient)}>
                         Editar
                       </Button>
