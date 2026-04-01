@@ -7,16 +7,12 @@ import { patientRoutes } from './routes/patients'
 import { appointmentRoutes } from './routes/appointments'
 import { dashboardRoutes } from './routes/dashboard'
 import { recordRoutes } from './routes/records'
+import { paymentRoutes } from './routes/payments'
 
 const app = Fastify({ logger: true })
 
-app.register(cors, {
-  origin: process.env.WEB_URL || '*',
-})
-
-app.register(jwt, {
-  secret: process.env.JWT_SECRET || 'secret',
-})
+app.register(cors, { origin: process.env.WEB_URL || '*' })
+app.register(jwt, { secret: process.env.JWT_SECRET || 'secret' })
 
 app.register(authRoutes, { prefix: '/auth' })
 app.register(doctorRoutes, { prefix: '/doctors' })
@@ -24,10 +20,9 @@ app.register(patientRoutes, { prefix: '/patients' })
 app.register(appointmentRoutes, { prefix: '/appointments' })
 app.register(dashboardRoutes, { prefix: '/dashboard' })
 app.register(recordRoutes, { prefix: '/records' })
+app.register(paymentRoutes, { prefix: '/payments' })
 
-app.get('/health', async () => {
-  return { status: 'ok' }
-})
+app.get('/health', async () => ({ status: 'ok' }))
 
 const start = async () => {
   try {

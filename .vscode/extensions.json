@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "anthropic.claude-code",
+    "dbaeumer.vscode-eslint",
+    "dracula-theme.theme-dracula",
+    "eamodio.gitlens",
+    "esbenp.prettier-vscode"
+  ]
+}
