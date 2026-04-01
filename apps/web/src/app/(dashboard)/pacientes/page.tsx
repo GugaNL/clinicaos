@@ -163,13 +163,57 @@ export default function PacientesPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="birthDate">Data de nascimento</Label>
-                  <Input
-                    id="birthDate"
-                    type="date"
-                    value={form.birthDate}
-                    onChange={(e) => setForm({ ...form, birthDate: e.target.value })}
-                  />
+                  <Label>Data de nascimento</Label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <select
+                      value={form.birthDate ? form.birthDate.split('-')[2] : ''}
+                      onChange={(e) => {
+                        const parts = form.birthDate ? form.birthDate.split('-') : ['', '', '']
+                        parts[2] = e.target.value
+                        setForm({ ...form, birthDate: parts.join('-') })
+                      }}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    >
+                      <option value="">Dia</option>
+                      {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
+                        <option key={d} value={String(d).padStart(2, '0')}>
+                          {String(d).padStart(2, '0')}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      value={form.birthDate ? form.birthDate.split('-')[1] : ''}
+                      onChange={(e) => {
+                        const parts = form.birthDate ? form.birthDate.split('-') : ['', '', '']
+                        parts[1] = e.target.value
+                        setForm({ ...form, birthDate: parts.join('-') })
+                      }}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    >
+                      <option value="">Mês</option>
+                      {['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'].map((m, i) => (
+                        <option key={i} value={String(i + 1).padStart(2, '0')}>
+                          {m}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      value={form.birthDate ? form.birthDate.split('-')[0] : ''}
+                      onChange={(e) => {
+                        const parts = form.birthDate ? form.birthDate.split('-') : ['', '', '']
+                        parts[0] = e.target.value
+                        setForm({ ...form, birthDate: parts.join('-') })
+                      }}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    >
+                      <option value="">Ano</option>
+                      {Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i).map((y) => (
+                        <option key={y} value={y}>
+                          {y}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="notes">Observações</Label>
