@@ -4,13 +4,13 @@ RUN npm install -g turbo
 FROM base AS pruner
 WORKDIR /app
 COPY . .
-RUN turbo prune --scope=api --docker
+RUN turbo prune api --docker
 
 FROM base AS builder
 WORKDIR /app
 COPY --from=pruner /app/out/json/ .
-COPY --from=pruner /app/out/package-lock.json ./package-lock.json
-RUN npm install
+COPY --from=pruner /app/out/yarn.lock ./yarn.lock
+RUN yarn install --frozen-lockfile
 
 COPY --from=pruner /app/out/full/ .
 RUN turbo run build --filter=api
