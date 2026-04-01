@@ -1,4 +1,5 @@
 FROM node:20-alpine AS base
+RUN apk add --no-cache openssl
 RUN npm install -g turbo
 
 FROM base AS pruner
@@ -16,6 +17,7 @@ COPY --from=pruner /app/out/full/ .
 RUN turbo run build --filter=api
 
 FROM node:20-alpine AS runner
+RUN apk add --no-cache openssl
 WORKDIR /app
 
 RUN addgroup --system --gid 1001 nodejs
