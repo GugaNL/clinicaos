@@ -14,7 +14,7 @@ COPY --from=pruner /app/out/yarn.lock ./yarn.lock
 RUN yarn install --frozen-lockfile
 
 COPY --from=pruner /app/out/full/ .
-RUN cd packages/database && yarn prisma generate
+RUN cd apps/api && yarn prisma generate
 RUN turbo run build --filter=api
 
 FROM node:20-alpine AS runner
@@ -26,9 +26,8 @@ RUN adduser --system --uid 1001 fastify
 
 COPY --from=builder --chown=fastify:nodejs /app/apps/api/dist ./dist
 COPY --from=builder --chown=fastify:nodejs /app/apps/api/package.json .
-COPY --from=builder --chown=fastify:nodejs /app/packages/database/prisma ./prisma
+COPY --from=builder --chown=fastify:nodejs /app/apps/api/prisma ./prisma
 COPY --from=builder --chown=fastify:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=fastify:nodejs /app/packages ./packages
 
 USER fastify
 

@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import { prisma } from 'database'
+import { prisma } from '../lib/prisma'
 import { createHash } from 'crypto'
 
 function hashPassword(password: string) {
