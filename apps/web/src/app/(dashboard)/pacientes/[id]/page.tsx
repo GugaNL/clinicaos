@@ -54,41 +54,26 @@ export default function PatientPage() {
     notes: '',
   })
 
-async function loadData() {
-  console.log('carregando dados para id:', id)
-  try {
-    const [patRes, recRes] = await Promise.all([
-      api.get(`/patients/${id}`),
-      api.get(`/records/patient/${id}`),
-    ])
-    setPatient(patRes.data)
-    setRecords(recRes.data)
-    console.log('records:', recRes.data)
-console.log('records length:', recRes.data.length)
-  } catch {
-    toast.error('Erro ao carregar dados do paciente')
-  } finally {
-    setLoading(false)
+  async function loadData() {
+    try {
+      const [patRes, recRes] = await Promise.all([
+        api.get(`/patients/${id}`),
+        api.get(`/records/patient/${id}`),
+      ])
+      setPatient(patRes.data)
+      setRecords(recRes.data)
+    } catch {
+      toast.error('Erro ao carregar dados do paciente')
+    } finally {
+      setLoading(false)
+    }
   }
-}
 
   useEffect(() => {
     if (!id) return
     loadData()
   }, [id])
 
-  function openNew() {
-    setEditingRecord(null)
-    setForm({
-      complaint: '',
-      anamnesis: '',
-      physicalExam: '',
-      diagnosis: '',
-      prescription: '',
-      notes: '',
-    })
-    setShowForm(true)
-  }
 
   function openEdit(record: MedicalRecord) {
     setEditingRecord(record)
