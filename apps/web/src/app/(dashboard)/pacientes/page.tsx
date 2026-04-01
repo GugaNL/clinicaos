@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
+import { IMaskInput } from 'react-imask'
 
 interface Patient {
   id: string
@@ -141,20 +142,24 @@ export default function PacientesPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="phone">Telefone</Label>
-                  <Input
+                  <IMaskInput
                     id="phone"
-                    placeholder="(81) 99999-9999"
+                    mask="(00) 00000-0000"
                     value={form.phone}
-                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                    onAccept={(value) => setForm({ ...form, phone: value })}
+                    placeholder="(81) 99999-9999"
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="cpf">CPF</Label>
-                  <Input
+                  <IMaskInput
                     id="cpf"
-                    placeholder="000.000.000-00"
+                    mask="000.000.000-00"
                     value={form.cpf}
-                    onChange={(e) => setForm({ ...form, cpf: e.target.value })}
+                    onAccept={(value) => setForm({ ...form, cpf: value })}
+                    placeholder="000.000.000-00"
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   />
                 </div>
                 <div className="space-y-2">
