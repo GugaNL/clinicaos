@@ -1,21 +1,28 @@
 'use client'
 
-import { useAuth } from '@/hooks/useAuth'
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { useRouter, usePathname } from 'next/navigation'
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const { loading } = useAuth()
+  const router = useRouter()
+  const pathname = usePathname()
+  const [ready, setReady] = useState(false)
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-slate-500">Carregando...</p>
-      </div>
-    )
+useEffect(() => {
+  const token = localStorage.getItem('token')
+  if (!token) {
+    router.replace('/login')
+    return
   }
+  setReady(true)
+}, [router])
+
+  if (!ready) return null
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -24,21 +31,21 @@ export default function DashboardLayout({
           <h1 className="text-xl font-semibold text-slate-900">ClinicaOS</h1>
         </div>
         <nav className="flex-1 p-4 space-y-1">
-          <a href="/dashboard" className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-700 hover:bg-slate-100">
-            Dashboard
-          </a>
-          <a href="/agendamentos" className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-700 hover:bg-slate-100">
-            Agendamentos
-          </a>
-          <a href="/pacientes" className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-700 hover:bg-slate-100">
-            Pacientes
-          </a>
-          <a href="/medicos" className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-700 hover:bg-slate-100">
-            Médicos
-          </a>
-          <a href="/financeiro" className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-700 hover:bg-slate-100">
-            Financeiro
-          </a>
+        <Link href="/dashboard" className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-slate-100 ${pathname === '/dashboard' ? 'bg-slate-100 text-slate-900 font-medium' : 'text-slate-700'}`}>
+          Dashboard
+        </Link>
+        <Link href="/agendamentos" className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-slate-100 ${pathname === '/agendamentos' ? 'bg-slate-100 text-slate-900 font-medium' : 'text-slate-700'}`}>
+          Agendamentos
+        </Link>
+        <Link href="/pacientes" className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-slate-100 ${pathname?.startsWith('/pacientes') ? 'bg-slate-100 text-slate-900 font-medium' : 'text-slate-700'}`}>
+          Pacientes
+        </Link>
+        <Link href="/medicos" className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-slate-100 ${pathname === '/medicos' ? 'bg-slate-100 text-slate-900 font-medium' : 'text-slate-700'}`}>
+          Médicos
+        </Link>
+        <Link href="/financeiro" className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-slate-100 ${pathname === '/financeiro' ? 'bg-slate-100 text-slate-900 font-medium' : 'text-slate-700'}`}>
+          Financeiro
+        </Link>
         </nav>
         <div className="p-4 border-t border-slate-200">
           <button
