@@ -2,6 +2,7 @@ import Fastify from 'fastify'
 import cors from '@fastify/cors'
 import jwt from '@fastify/jwt'
 import { authRoutes } from './routes/auth'
+import { doctorRoutes } from './routes/doctors'
 
 const app = Fastify({ logger: true })
 
@@ -14,6 +15,7 @@ app.register(jwt, {
 })
 
 app.register(authRoutes, { prefix: '/auth' })
+app.register(doctorRoutes, { prefix: '/doctors' })
 
 app.get('/health', async () => {
   return { status: 'ok' }
