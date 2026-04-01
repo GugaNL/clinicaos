@@ -1,5 +1,4 @@
 FROM node:20-alpine AS base
-RUN apk add --no-cache openssl
 RUN npm install -g turbo
 
 FROM base AS pruner
