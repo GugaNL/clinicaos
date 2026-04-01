@@ -4,6 +4,7 @@ import jwt from '@fastify/jwt'
 import { authRoutes } from './routes/auth'
 import { doctorRoutes } from './routes/doctors'
 import { patientRoutes } from './routes/patients'
+import { appointmentRoutes } from './routes/appointments'
 
 const app = Fastify({ logger: true })
 
@@ -18,6 +19,7 @@ app.register(jwt, {
 app.register(authRoutes, { prefix: '/auth' })
 app.register(doctorRoutes, { prefix: '/doctors' })
 app.register(patientRoutes, { prefix: '/patients' })
+app.register(appointmentRoutes, { prefix: '/appointments' })
 
 app.get('/health', async () => {
   return { status: 'ok' }
