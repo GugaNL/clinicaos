@@ -8,6 +8,8 @@ import { appointmentRoutes } from './routes/appointments'
 import { dashboardRoutes } from './routes/dashboard'
 import { recordRoutes } from './routes/records'
 import { paymentRoutes } from './routes/payments'
+import { sendAppointmentReminders } from './jobs/reminders'
+import { sendConfirmationMessage, sendPostConsultationMessage } from './jobs/reminders'
 
 const app = Fastify({ logger: true })
 
@@ -23,6 +25,11 @@ app.register(recordRoutes, { prefix: '/records' })
 app.register(paymentRoutes, { prefix: '/payments' })
 
 app.get('/health', async () => ({ status: 'ok' }))
+
+setInterval(async () => {
+  console.log('Verificando lembretes...')
+  await sendAppointmentReminders()
+}, 60 * 60 * 1000)
 
 const start = async () => {
   try {

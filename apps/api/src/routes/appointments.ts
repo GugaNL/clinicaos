@@ -2,6 +2,7 @@ import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 import { prisma } from '../lib/prisma'
 import { authenticate } from '../middlewares/tenant'
+import { sendConfirmationMessage, sendPostConsultationMessage } from '../jobs/reminders'
 
 export async function appointmentRoutes(app: FastifyInstance) {
   // Listar agendamentos por período
@@ -84,6 +85,8 @@ export async function appointmentRoutes(app: FastifyInstance) {
       },
     })
 
+    sendConfirmationMessage(appointment.id).catch(console.error)
+
     return reply.status(201).send(appointment)
   })
 
@@ -114,6 +117,10 @@ export async function appointmentRoutes(app: FastifyInstance) {
       data: { status: result.data.status },
       include: { doctor: true, patient: true },
     })
+
+    if (result.data.status === 'DONE') {
+      sendPostConsultationMessage(id).catch(console.error)
+    }
 
     return reply.send(updated)
   })
