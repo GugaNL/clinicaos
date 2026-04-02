@@ -11,6 +11,7 @@ import { paymentRoutes } from './routes/payments'
 import { sendAppointmentReminders } from './jobs/reminders'
 import { settingsRoutes } from './routes/settings'
 import { searchRoutes } from './routes/search'
+import { notificationRoutes } from './routes/notifications'
 
 const app = Fastify({ logger: true })
 
@@ -26,6 +27,7 @@ app.register(recordRoutes, { prefix: '/records' })
 app.register(paymentRoutes, { prefix: '/payments' })
 app.register(settingsRoutes, { prefix: '/settings' })
 app.register(searchRoutes, { prefix: '/search' })
+app.register(notificationRoutes, { prefix: '/notifications' })
 
 app.get('/health', async () => ({ status: 'ok' }))
 

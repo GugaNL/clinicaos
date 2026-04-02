@@ -15,6 +15,7 @@ import {
   Settings
 } from 'lucide-react'
 import { GlobalSearch } from '@/components/GlobalSearch'
+import { Notifications } from '@/components/Notifications'
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -158,8 +159,9 @@ export default function DashboardLayout({
       {/* Desktop top bar */}
       <div className="hidden md:flex fixed top-0 left-60 right-0 z-20 bg-white border-b border-slate-200 px-8 py-2 items-center justify-between">
         <GlobalSearch />
-        <div className="flex items-center gap-2 text-xs text-slate-400">
-          <span>ClinicaOS</span>
+        <div className="flex items-center gap-2">
+          <Notifications />
+          <span className="text-xs text-slate-400">ClinicaOS</span>
         </div>
       </div>
 
