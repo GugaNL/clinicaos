@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { prisma } from '../lib/prisma'
 import { authenticate } from '../middlewares/tenant'
 import { startOfMonth, endOfMonth, subMonths } from 'date-fns'
+import { mpPayment } from '../lib/mercadopago'
 
 export async function paymentRoutes(app: FastifyInstance) {
   // Listar pagamentos
@@ -196,5 +197,85 @@ export async function paymentRoutes(app: FastifyInstance) {
     })
 
     return reply.send(overdue)
+  })
+
+  // Gerar PIX via Mercado Pago
+  app.post('/:id/pix', { preHandler: authenticate }, async (request, reply) => {
+    const { clinicId } = request.user as { clinicId: string }
+    const { id } = request.params as { id: string }
+
+    const payment = await prisma.payment.findFirst({
+      where: { id, clinicId },
+      include: {
+        appointment: {
+          include: { patient: true },
+        },
+      },
+    })
+
+    if (!payment) {
+      return reply.status(404).send({ error: 'Pagamento não encontrado' })
+    }
+
+    if (payment.status === 'PAID') {
+      return reply.status(400).send({ error: 'Pagamento já realizado' })
+    }
+
+    try {
+      const mpResponse = await mpPayment.create({
+        body: {
+          transaction_amount: Number(payment.amount),
+          description: `Consulta médica - ${payment.appointment.patient.name}`,
+          payment_method_id: 'pix',
+          external_reference: payment.id,
+          payer: {
+            email: payment.appointment.patient.email || 'paciente@clinicaos.com.br',
+            first_name: payment.appointment.patient.name.split(' ')[0],
+            last_name: payment.appointment.patient.name.split(' ').slice(1).join(' '),
+          },
+        },
+      })
+
+      return reply.send({
+        pixCopiaECola: mpResponse.point_of_interaction?.transaction_data?.qr_code,
+        qrCodeBase64: mpResponse.point_of_interaction?.transaction_data?.qr_code_base64,
+        mpPaymentId: mpResponse.id,
+        expiresAt: mpResponse.date_of_expiration,
+      })
+    } catch (err: any) {
+      return reply.status(500).send({ error: 'Erro ao gerar PIX', details: err.message })
+    }
+  })
+
+  // Webhook do Mercado Pago
+  app.post('/webhook/mercadopago', async (request, reply) => {
+    const body = request.body as any
+
+    if (body.type === 'payment') {
+      const mpId = body.data?.id
+      if (!mpId) return reply.status(200).send()
+
+      try {
+        const mpResponse = await mpPayment.get({ id: mpId })
+
+        if (mpResponse.status === 'approved') {
+          // Busca o pagamento pelo valor e atualiza
+          const externalRef = mpResponse.external_reference
+          if (externalRef) {
+            await prisma.payment.update({
+              where: { id: externalRef },
+              data: {
+                status: 'PAID',
+                paidAt: new Date(),
+              },
+            })
+          }
+        }
+      } catch (err) {
+        console.error('Erro no webhook MP:', err)
+      }
+    }
+
+    return reply.status(200).send()
   })
 }

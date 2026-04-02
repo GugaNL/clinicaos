@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import { api } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -79,6 +80,12 @@ export default function FinanceiroPage() {
   const [filterEnd, setFilterEnd] = useState(
     format(endOfMonth(new Date()), 'yyyy-MM-dd')
   )
+  const [pixData, setPixData] = useState<{
+    pixCopiaECola: string
+    qrCodeBase64: string
+    expiresAt: string
+  } | null>(null)
+  const [pixLoading, setPixLoading] = useState(false)
 
   async function loadData() {
     setLoading(true)
@@ -118,36 +125,49 @@ export default function FinanceiroPage() {
     }
   }
 
-async function generateReceipt(payment: Payment) {
-  const jsPDF = (await import('jspdf')).jsPDF
+  async function handleGeneratePix(payment: Payment) {
+    setPixLoading(true)
+    try {
+      const { data } = await api.post(`/payments/${payment.id}/pix`)
+      setPixData(data)
+      toast.success('PIX gerado com sucesso!')
+    } catch {
+      toast.error('Erro ao gerar PIX')
+    } finally {
+      setPixLoading(false)
+    }
+  }
 
-  const doc = new jsPDF()
+  async function generateReceipt(payment: Payment) {
+    const jsPDF = (await import('jspdf')).jsPDF
 
-  doc.setFontSize(20)
-  doc.text('RECIBO DE PAGAMENTO', 105, 20, { align: 'center' })
+    const doc = new jsPDF()
 
-  doc.setFontSize(12)
-  doc.text(`Paciente: ${payment.appointment.patient.name}`, 20, 50)
-  doc.text(`Médico: ${payment.appointment.doctor.name}`, 20, 60)
-  doc.text(
-    `Data da consulta: ${format(parseISO(payment.appointment.startsAt), "dd/MM/yyyy 'às' HH:mm")}`,
-    20, 70
-  )
-  doc.text(`Forma de pagamento: ${METHOD_LABELS[payment.method]}`, 20, 80)
-  doc.text(`Valor: ${formatCurrency(Number(payment.amount))}`, 20, 90)
-  doc.text(
-    `Data do pagamento: ${payment.paidAt ? format(parseISO(payment.paidAt), 'dd/MM/yyyy') : '—'}`,
-    20, 100
-  )
+    doc.setFontSize(20)
+    doc.text('RECIBO DE PAGAMENTO', 105, 20, { align: 'center' })
 
-  doc.setFontSize(10)
-  doc.text(
-    `Recibo gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`,
-    105, 280,
-    { align: 'center' }
-  )
+    doc.setFontSize(12)
+    doc.text(`Paciente: ${payment.appointment.patient.name}`, 20, 50)
+    doc.text(`Médico: ${payment.appointment.doctor.name}`, 20, 60)
+    doc.text(
+      `Data da consulta: ${format(parseISO(payment.appointment.startsAt), "dd/MM/yyyy 'às' HH:mm")}`,
+      20, 70
+    )
+    doc.text(`Forma de pagamento: ${METHOD_LABELS[payment.method]}`, 20, 80)
+    doc.text(`Valor: ${formatCurrency(Number(payment.amount))}`, 20, 90)
+    doc.text(
+      `Data do pagamento: ${payment.paidAt ? format(parseISO(payment.paidAt), 'dd/MM/yyyy') : '—'}`,
+      20, 100
+    )
 
-  doc.save(`recibo-${payment.appointment.patient.name.toLowerCase().replace(/\s+/g, '-')}.pdf`)
+    doc.setFontSize(10)
+    doc.text(
+      `Recibo gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`,
+      105, 280,
+      { align: 'center' }
+    )
+
+    doc.save(`recibo-${payment.appointment.patient.name.toLowerCase().replace(/\s+/g, '-')}.pdf`)
 }
 
   const totalPaid = payments
@@ -290,14 +310,25 @@ async function generateReceipt(payment: Payment) {
                       <td className="px-4 py-3">
                         <div className="flex gap-2 justify-end">
                           {payment.status === 'PENDING' && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="text-green-600"
-                              onClick={() => handleStatusChange(payment.id, 'PAID')}
-                            >
-                              Marcar pago
-                            </Button>
+                            <>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="text-blue-600"
+                                disabled={pixLoading}
+                                onClick={() => handleGeneratePix(payment)}
+                              >
+                                Gerar PIX
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="text-green-600"
+                                onClick={() => handleStatusChange(payment.id, 'PAID')}
+                              >
+                                Marcar pago
+                              </Button>
+                            </>
                           )}
                           {payment.status === 'PAID' && (
                             <Button
@@ -415,6 +446,58 @@ async function generateReceipt(payment: Payment) {
               </table>
             </div>
           )}
+        </div>
+      )}
+      {pixData && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-md mx-4">
+            <CardHeader>
+              <CardTitle className="text-base text-center">Pague com PIX</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 text-center">
+              {pixData.qrCodeBase64 && (
+                <Image
+                  src={`data:image/png;base64,${pixData.qrCodeBase64}`}
+                  alt="QR Code PIX"
+                  width={192}
+                  height={192}
+                  className="mx-auto h-48 w-48"
+                  unoptimized
+                />
+              )}
+              <div className="space-y-2">
+                <p className="text-sm text-slate-500">PIX Copia e Cola</p>
+                <div className="flex gap-2">
+                  <input
+                    readOnly
+                    value={pixData.pixCopiaECola}
+                    className="flex-1 text-xs rounded-md border border-input bg-background px-3 py-2 truncate"
+                  />
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      navigator.clipboard.writeText(pixData.pixCopiaECola)
+                      toast.success('Copiado!')
+                    }}
+                  >
+                    Copiar
+                  </Button>
+                </div>
+              </div>
+              {pixData.expiresAt && (
+                <p className="text-xs text-slate-400">
+                  Expira em {format(parseISO(pixData.expiresAt), "dd/MM/yyyy 'às' HH:mm")}
+                </p>
+              )}
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => setPixData(null)}
+              >
+                Fechar
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       )}
     </div>
