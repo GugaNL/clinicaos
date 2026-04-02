@@ -242,9 +242,10 @@ export async function paymentRoutes(app: FastifyInstance) {
         mpPaymentId: mpResponse.id,
         expiresAt: mpResponse.date_of_expiration,
       })
-    } catch (err: any) {
-      return reply.status(500).send({ error: 'Erro ao gerar PIX', details: err.message })
-    }
+      } catch (err: any) {
+        console.error('Erro ao gerar PIX:', JSON.stringify(err?.cause || err?.message || err))
+        return reply.status(500).send({ error: 'Erro ao gerar PIX', details: err.message })
+      }
   })
 
   // Webhook do Mercado Pago
