@@ -141,35 +141,128 @@ export default function FinanceiroPage() {
 
   async function generateReceipt(payment: Payment) {
     const jsPDF = (await import('jspdf')).jsPDF
-
     const doc = new jsPDF()
 
-    doc.setFontSize(20)
-    doc.text('RECIBO DE PAGAMENTO', 105, 20, { align: 'center' })
+    const blue = '#2563eb'
+    const darkBlue = '#1e40af'
+    const gray = '#64748b'
+    const lightGray = '#f1f5f9'
+    const dark = '#0f172a'
 
-    doc.setFontSize(12)
-    doc.text(`Paciente: ${payment.appointment.patient.name}`, 20, 50)
-    doc.text(`Médico: ${payment.appointment.doctor.name}`, 20, 60)
-    doc.text(
-      `Data da consulta: ${format(parseISO(payment.appointment.startsAt), "dd/MM/yyyy 'às' HH:mm")}`,
-      20, 70
-    )
-    doc.text(`Forma de pagamento: ${METHOD_LABELS[payment.method]}`, 20, 80)
-    doc.text(`Valor: ${formatCurrency(Number(payment.amount))}`, 20, 90)
-    doc.text(
-      `Data do pagamento: ${payment.paidAt ? format(parseISO(payment.paidAt), 'dd/MM/yyyy') : '—'}`,
-      20, 100
-    )
+    // Cabeçalho azul
+    doc.setFillColor(37, 99, 235)
+    doc.rect(0, 0, 210, 45, 'F')
 
+    // Título
+    doc.setTextColor(255, 255, 255)
+    doc.setFontSize(22)
+    doc.setFont('helvetica', 'bold')
+    doc.text('ClinicaOS', 20, 20)
+
+    doc.setFontSize(11)
+    doc.setFont('helvetica', 'normal')
+    doc.text('Sistema de Gestão Clínica', 20, 30)
+
+    doc.setFontSize(14)
+    doc.setFont('helvetica', 'bold')
+    doc.text('RECIBO DE PAGAMENTO', 210 - 20, 25, { align: 'right' })
+
+    // Número do recibo
+    doc.setFontSize(9)
+    doc.setFont('helvetica', 'normal')
+    doc.text(`Nº ${payment.id.slice(-8).toUpperCase()}`, 210 - 20, 35, { align: 'right' })
+
+    // Faixa cinza claro
+    doc.setFillColor(241, 245, 249)
+    doc.rect(0, 45, 210, 20, 'F')
+
+    doc.setTextColor(100, 116, 139)
+    doc.setFontSize(9)
+    doc.setFont('helvetica', 'normal')
+    doc.text('Data de emissão:', 20, 57)
+    doc.setTextColor(15, 23, 42)
+    doc.setFont('helvetica', 'bold')
+    doc.text(format(new Date(), "dd/MM/yyyy 'às' HH:mm"), 60, 57)
+
+    doc.setTextColor(100, 116, 139)
+    doc.setFont('helvetica', 'normal')
+    doc.text('Status:', 130, 57)
+    doc.setTextColor(22, 163, 74)
+    doc.setFont('helvetica', 'bold')
+    doc.text('PAGO', 150, 57)
+
+    // Seção: Dados da consulta
+    doc.setFillColor(255, 255, 255)
+    doc.setTextColor(37, 99, 235)
     doc.setFontSize(10)
+    doc.setFont('helvetica', 'bold')
+    doc.text('DADOS DA CONSULTA', 20, 80)
+
+    doc.setDrawColor(37, 99, 235)
+    doc.setLineWidth(0.5)
+    doc.line(20, 83, 190, 83)
+
+    const fields = [
+      { label: 'Paciente', value: payment.appointment.patient.name },
+      { label: 'Médico', value: payment.appointment.doctor.name },
+      { label: 'Data da consulta', value: format(parseISO(payment.appointment.startsAt), "dd/MM/yyyy 'às' HH:mm") },
+      { label: 'Forma de pagamento', value: METHOD_LABELS[payment.method] },
+      { label: 'Data do pagamento', value: payment.paidAt ? format(parseISO(payment.paidAt), 'dd/MM/yyyy') : '—' },
+    ]
+
+    let y = 95
+    fields.forEach((field, i) => {
+      if (i % 2 === 0) {
+        doc.setFillColor(248, 250, 252)
+        doc.rect(15, y - 6, 180, 14, 'F')
+      }
+      doc.setTextColor(100, 116, 139)
+      doc.setFontSize(9)
+      doc.setFont('helvetica', 'normal')
+      doc.text(field.label + ':', 20, y)
+      doc.setTextColor(15, 23, 42)
+      doc.setFont('helvetica', 'bold')
+      doc.text(field.value, 80, y)
+      y += 16
+    })
+
+    // Seção: Valor
+    y += 10
+    doc.setFillColor(37, 99, 235)
+    doc.rect(15, y - 8, 180, 28, 'F')
+
+    doc.setTextColor(255, 255, 255)
+    doc.setFontSize(11)
+    doc.setFont('helvetica', 'normal')
+    doc.text('VALOR TOTAL PAGO', 20, y + 4)
+
+    doc.setFontSize(20)
+    doc.setFont('helvetica', 'bold')
     doc.text(
-      `Recibo gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`,
-      105, 280,
-      { align: 'center' }
+      new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(payment.amount)),
+      190,
+      y + 4,
+      { align: 'right' }
     )
 
-    doc.save(`recibo-${payment.appointment.patient.name.toLowerCase().replace(/\s+/g, '-')}.pdf`)
-}
+    doc.setFontSize(9)
+    doc.setFont('helvetica', 'normal')
+    doc.text(`Por extenso: ${formatCurrency(Number(payment.amount))}`, 20, y + 14)
+
+    // Rodapé
+    doc.setDrawColor(226, 232, 240)
+    doc.setLineWidth(0.3)
+    doc.line(15, 265, 195, 265)
+
+    doc.setTextColor(148, 163, 184)
+    doc.setFontSize(8)
+    doc.setFont('helvetica', 'normal')
+    doc.text('Este recibo é válido como comprovante de pagamento.', 105, 272, { align: 'center' })
+    doc.text('ClinicaOS — Sistema de Gestão Clínica', 105, 279, { align: 'center' })
+    doc.text(`app.codexlabdigital.com.br`, 105, 286, { align: 'center' })
+
+    doc.save(`recibo-${payment.appointment.patient.name.toLowerCase().replace(/\s+/g, '-')}-${format(new Date(), 'ddMMyyyy')}.pdf`)
+  }
 
   const totalPaid = payments
     .filter((p) => p.status === 'PAID')
@@ -474,55 +567,66 @@ export default function FinanceiroPage() {
         </div>
       )}
       {pixData && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-md mx-4">
-            <CardHeader>
-              <CardTitle className="text-base text-center">Pague com PIX</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 text-center">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
+            {/* Header */}
+            <div className="bg-blue-600 px-6 py-4 text-center">
+              <p className="text-white font-semibold text-lg">Pague com PIX</p>
+              <p className="text-blue-100 text-sm mt-0.5">Escaneie o QR Code ou copie o código</p>
+            </div>
+
+            <div className="p-6 space-y-5">
+              {/* QR Code */}
               {pixData.qrCodeBase64 && (
-                <Image
-                  src={`data:image/png;base64,${pixData.qrCodeBase64}`}
-                  alt="QR Code PIX"
-                  width={192}
-                  height={192}
-                  className="mx-auto h-48 w-48"
-                  unoptimized
-                />
+                <div className="flex justify-center">
+                  <div className="border-4 border-blue-600 rounded-xl p-2">
+                    <img
+                      src={`data:image/png;base64,${pixData.qrCodeBase64}`}
+                      alt="QR Code PIX"
+                      className="w-44 h-44"
+                    />
+                  </div>
+                </div>
               )}
+
+              {/* Validade */}
+              {pixData.expiresAt && (
+                <div className="flex items-center justify-center gap-2 text-xs text-slate-500 bg-slate-50 rounded-lg py-2">
+                  <span>⏱</span>
+                  <span>Expira em {format(parseISO(pixData.expiresAt), "dd/MM/yyyy 'às' HH:mm")}</span>
+                </div>
+              )}
+
+              {/* PIX Copia e Cola */}
               <div className="space-y-2">
-                <p className="text-sm text-slate-500">PIX Copia e Cola</p>
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">PIX Copia e Cola</p>
                 <div className="flex gap-2">
-                  <input
-                    readOnly
-                    value={pixData.pixCopiaECola}
-                    className="flex-1 text-xs rounded-md border border-input bg-background px-3 py-2 truncate"
-                  />
+                  <div className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-600 truncate font-mono">
+                    {pixData.pixCopiaECola}
+                  </div>
                   <Button
                     size="sm"
+                    className="bg-blue-600 hover:bg-blue-700 shrink-0"
                     onClick={() => {
                       navigator.clipboard.writeText(pixData.pixCopiaECola)
-                      toast.success('Copiado!')
+                      toast.success('Código copiado!')
                     }}
                   >
                     Copiar
                   </Button>
                 </div>
               </div>
-              {pixData.expiresAt && (
-                <p className="text-xs text-slate-400">
-                  Expira em {format(parseISO(pixData.expiresAt), "dd/MM/yyyy 'às' HH:mm")}
-                </p>
-              )}
+
+              {/* Fechar */}
               <Button
                 variant="outline"
-                className="w-full"
+                className="w-full border-slate-200 text-slate-600"
                 onClick={() => setPixData(null)}
               >
                 Fechar
               </Button>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       )}
     </div>
