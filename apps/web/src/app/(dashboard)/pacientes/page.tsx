@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
+import { FormField } from '@/components/ui/form-field'
 import { IMaskInput } from 'react-imask'
 
 interface Patient {
@@ -106,66 +107,76 @@ export default function PacientesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-semibold text-slate-900">Pacientes</h2>
-          <p className="text-slate-500">Gerencie os pacientes da sua clínica</p>
-        </div>
-        <Button onClick={openNew}>Novo paciente</Button>
+    <div className="flex items-center justify-between">
+      <div>
+        <h2 className="text-2xl font-bold text-slate-900">Pacientes</h2>
+        <p className="text-slate-500 mt-0.5">Gerencie os pacientes da sua clínica</p>
       </div>
+      <Button
+        onClick={openNew}
+        className="bg-blue-600 hover:bg-blue-700 gap-2"
+      >
+        + Novo paciente
+      </Button>
+    </div>
 
       {showForm && (
-        <Card>
-          <CardHeader>
-            <CardTitle>{editingPatient ? 'Editar paciente' : 'Novo paciente'}</CardTitle>
+        <Card className="border-slate-200 shadow-sm">
+          <CardHeader className="pb-4 border-b border-slate-100">
+            <CardTitle className="text-base font-semibold text-slate-900">
+              {editingPatient ? 'Editar paciente' : 'Novo paciente'}
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+          <CardContent className="pt-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Nome completo</Label>
-                  <Input
-                    id="name"
-                    placeholder="Maria da Silva"
-                    value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">E-mail</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="maria@email.com"
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Telefone</Label>
+                <FormField
+                  id="name"
+                  label="Nome completo"
+                  placeholder="Maria da Silva"
+                  value={form.name}
+                  onChange={(v) => setForm({ ...form, name: v })}
+                  required
+                />
+                <FormField
+                  id="email"
+                  label="E-mail"
+                  type="email"
+                  placeholder="maria@email.com"
+                  value={form.email}
+                  onChange={(v) => setForm({ ...form, email: v })}
+                />
+                <div className="space-y-1.5">
+                  <label htmlFor="phone" className="text-sm font-medium text-slate-700">
+                    Telefone
+                  </label>
                   <IMaskInput
                     id="phone"
                     mask="(00) 00000-0000"
                     value={form.phone}
                     onAccept={(value) => setForm({ ...form, phone: value })}
                     placeholder="(81) 99999-9999"
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    autoComplete="new-password"
+                    className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="cpf">CPF</Label>
+                <div className="space-y-1.5">
+                  <label htmlFor="cpf" className="text-sm font-medium text-slate-700">
+                    CPF
+                  </label>
                   <IMaskInput
                     id="cpf"
                     mask="000.000.000-00"
                     value={form.cpf}
                     onAccept={(value) => setForm({ ...form, cpf: value })}
                     placeholder="000.000.000-00"
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label>Data de nascimento</Label>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-slate-700">
+                    Data de nascimento
+                  </label>
                   <div className="grid grid-cols-3 gap-2">
                     <select
                       value={form.birthDate ? form.birthDate.split('-')[2] : ''}
@@ -174,7 +185,7 @@ export default function PacientesPage() {
                         parts[2] = e.target.value
                         setForm({ ...form, birthDate: parts.join('-') })
                       }}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     >
                       <option value="">Dia</option>
                       {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
@@ -190,13 +201,11 @@ export default function PacientesPage() {
                         parts[1] = e.target.value
                         setForm({ ...form, birthDate: parts.join('-') })
                       }}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     >
                       <option value="">Mês</option>
                       {['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'].map((m, i) => (
-                        <option key={i} value={String(i + 1).padStart(2, '0')}>
-                          {m}
-                        </option>
+                        <option key={i} value={String(i + 1).padStart(2, '0')}>{m}</option>
                       ))}
                     </select>
                     <select
@@ -206,29 +215,25 @@ export default function PacientesPage() {
                         parts[0] = e.target.value
                         setForm({ ...form, birthDate: parts.join('-') })
                       }}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     >
                       <option value="">Ano</option>
                       {Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i).map((y) => (
-                        <option key={y} value={y}>
-                          {y}
-                        </option>
+                        <option key={y} value={y}>{y}</option>
                       ))}
                     </select>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="notes">Observações</Label>
-                  <Input
-                    id="notes"
-                    placeholder="Alergia a dipirona..."
-                    value={form.notes}
-                    onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                  />
-                </div>
+                <FormField
+                  id="notes"
+                  label="Observações"
+                  placeholder="Alergia a dipirona..."
+                  value={form.notes}
+                  onChange={(v) => setForm({ ...form, notes: v })}
+                />
               </div>
-              <div className="flex gap-2">
-                <Button type="submit">
+              <div className="flex gap-2 pt-2 border-t border-slate-100">
+                <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
                   {editingPatient ? 'Salvar alterações' : 'Cadastrar paciente'}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
@@ -268,11 +273,11 @@ export default function PacientesPage() {
         <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50">
-                <th className="text-left px-4 py-3 text-sm font-medium text-slate-500">Nome</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-slate-500">Telefone</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-slate-500">CPF</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-slate-500">E-mail</th>
+              <tr className="border-b border-slate-200 bg-slate-50/80">
+                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Nome</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Telefone</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">CPF</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">E-mail</th>
                 <th className="px-4 py-3"></th>
               </tr>
             </thead>
@@ -295,17 +300,23 @@ export default function PacientesPage() {
                       <Button
                         variant="outline"
                         size="sm"
+                        className="border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-300"
                         onClick={() => router.push(`/pacientes/${patient.id}`)}
                       >
                         Prontuário
                       </Button>
-                      <Button variant="outline" size="sm" onClick={() => openEdit(patient)}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-slate-200 text-slate-600 hover:text-slate-900"
+                        onClick={() => openEdit(patient)}
+                      >
                         Editar
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
-                        className="text-red-600 hover:text-red-700"
+                        className="border-slate-200 text-red-500 hover:text-red-600 hover:border-red-300"
                         onClick={() => handleDelete(patient.id)}
                       >
                         Remover

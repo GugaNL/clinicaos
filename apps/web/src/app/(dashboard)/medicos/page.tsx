@@ -90,80 +90,91 @@ export default function MedicosPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-semibold text-slate-900">Médicos</h2>
-          <p className="text-slate-500">Gerencie os médicos da sua clínica</p>
-        </div>
-        <Button onClick={openNew}>Novo médico</Button>
+    <div className="flex items-center justify-between">
+      <div>
+        <h2 className="text-2xl font-bold text-slate-900">Médicos</h2>
+        <p className="text-slate-500 mt-0.5">Gerencie os médicos da sua clínica</p>
       </div>
+      <Button onClick={openNew} className="bg-blue-600 hover:bg-blue-700">
+        + Novo médico
+      </Button>
+    </div>
 
-      {showForm && (
-        <Card>
-          <CardHeader>
-            <CardTitle>{editingDoctor ? 'Editar médico' : 'Novo médico'}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Nome completo</Label>
-                  <Input
-                    id="name"
-                    placeholder="Dr. João Silva"
-                    value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    required
+    {showForm && (
+      <Card className="border-slate-200 shadow-sm">
+        <CardHeader className="pb-4 border-b border-slate-100">
+          <CardTitle className="text-base font-semibold text-slate-900">
+            {editingDoctor ? 'Editar médico' : 'Novo médico'}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label htmlFor="name" className="text-sm font-medium text-slate-700">
+                  Nome completo <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="name"
+                  placeholder="Dr. João Silva"
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  required
+                  className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label htmlFor="crm" className="text-sm font-medium text-slate-700">
+                  CRM
+                </label>
+                <input
+                  id="crm"
+                  placeholder="CRM/SP 123456"
+                  value={form.crm}
+                  onChange={(e) => setForm({ ...form, crm: e.target.value })}
+                  className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label htmlFor="specialty" className="text-sm font-medium text-slate-700">
+                  Especialidade
+                </label>
+                <input
+                  id="specialty"
+                  placeholder="Clínico Geral"
+                  value={form.specialty}
+                  onChange={(e) => setForm({ ...form, specialty: e.target.value })}
+                  className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label htmlFor="color" className="text-sm font-medium text-slate-700">
+                  Cor no calendário
+                </label>
+                <div className="flex gap-3 items-center">
+                  <input
+                    type="color"
+                    id="color"
+                    value={form.color}
+                    onChange={(e) => setForm({ ...form, color: e.target.value })}
+                    className="h-10 w-16 rounded-md border border-slate-200 cursor-pointer p-1 bg-white"
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="crm">CRM</Label>
-                  <Input
-                    id="crm"
-                    placeholder="CRM/SP 123456"
-                    value={form.crm}
-                    onChange={(e) => setForm({ ...form, crm: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="specialty">Especialidade</Label>
-                  <Input
-                    id="specialty"
-                    placeholder="Clínico Geral"
-                    value={form.specialty}
-                    onChange={(e) => setForm({ ...form, specialty: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="color">Cor no calendário</Label>
-                  <div className="flex gap-2 items-center">
-                    <input
-                      type="color"
-                      id="color"
-                      value={form.color}
-                      onChange={(e) => setForm({ ...form, color: e.target.value })}
-                      className="h-10 w-16 rounded border border-slate-200 cursor-pointer"
-                    />
-                    <span className="text-sm text-slate-500">{form.color}</span>
-                  </div>
+                  <span className="text-sm text-slate-500 font-mono">{form.color}</span>
                 </div>
               </div>
-              <div className="flex gap-2">
-                <Button type="submit">
-                  {editingDoctor ? 'Salvar alterações' : 'Cadastrar médico'}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowForm(false)}
-                >
-                  Cancelar
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      )}
+            </div>
+            <div className="flex gap-2 pt-2 border-t border-slate-100">
+              <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+                {editingDoctor ? 'Salvar alterações' : 'Cadastrar médico'}
+              </Button>
+              <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
+                Cancelar
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+    )}
 
       {loading ? (
         <p className="text-slate-500">Carregando...</p>
@@ -204,7 +215,7 @@ export default function MedicosPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="flex-1"
+                    className="flex-1 border-slate-200 text-slate-600 hover:text-slate-900"
                     onClick={() => openEdit(doctor)}
                   >
                     Editar
@@ -212,7 +223,7 @@ export default function MedicosPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="flex-1 text-red-600 hover:text-red-700"
+                    className="flex-1 border-slate-200 text-red-500 hover:text-red-600 hover:border-red-300"
                     onClick={() => handleDelete(doctor.id)}
                   >
                     Remover

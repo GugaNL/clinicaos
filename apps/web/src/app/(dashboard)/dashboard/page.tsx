@@ -118,7 +118,7 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-slate-900">Dashboard</h2>
-          <p className="text-slate-500 mt-0.5 capitalize">
+          <p className="text-slate-500 mt-0.5">
             {format(new Date(), "EEEE, d 'de' MMMM 'de' yyyy", { locale: ptBR })}
           </p>
         </div>

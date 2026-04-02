@@ -6,6 +6,7 @@ import { api } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
+import { DollarSign, Clock, AlertCircle } from 'lucide-react'
 import { format, parseISO, startOfMonth, endOfMonth } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import {
@@ -181,34 +182,49 @@ export default function FinanceiroPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-semibold text-slate-900">Financeiro</h2>
-        <p className="text-slate-500">Controle de cobranças e pagamentos</p>
+        <h2 className="text-2xl font-bold text-slate-900">Financeiro</h2>
+        <p className="text-slate-500 mt-0.5">Controle de cobranças e pagamentos</p>
       </div>
 
       {/* Cards de resumo */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-slate-500">Recebido no período</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold text-green-600">{formatCurrency(totalPaid)}</p>
+        <Card className="border-slate-200">
+          <CardContent className="pt-6">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm text-slate-500">Recebido no período</p>
+                <p className="text-2xl font-bold text-green-600 mt-1">{formatCurrency(totalPaid)}</p>
+              </div>
+              <div style={{ backgroundColor: '#f0fdf4', padding: '8px', borderRadius: '8px' }}>
+                <DollarSign style={{ color: '#16a34a', width: '20px', height: '20px' }} />
+              </div>
+            </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-slate-500">Pendente no período</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold text-amber-600">{formatCurrency(totalPending)}</p>
+        <Card className="border-slate-200">
+          <CardContent className="pt-6">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm text-slate-500">Pendente no período</p>
+                <p className="text-2xl font-bold text-amber-600 mt-1">{formatCurrency(totalPending)}</p>
+              </div>
+              <div style={{ backgroundColor: '#fffbeb', padding: '8px', borderRadius: '8px' }}>
+                <Clock style={{ color: '#d97706', width: '20px', height: '20px' }} />
+              </div>
+            </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-slate-500">Inadimplentes</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold text-red-600">{overdue.length}</p>
+        <Card className="border-slate-200">
+          <CardContent className="pt-6">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm text-slate-500">Inadimplentes</p>
+                <p className="text-2xl font-bold text-red-600 mt-1">{overdue.length}</p>
+              </div>
+              <div style={{ backgroundColor: '#fef2f2', padding: '8px', borderRadius: '8px' }}>
+                <AlertCircle style={{ color: '#dc2626', width: '20px', height: '20px' }} />
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -237,29 +253,38 @@ export default function FinanceiroPage() {
       {/* Tab: Cobranças */}
       {activeTab === 'payments' && (
         <div className="space-y-4">
-          <div className="flex flex-wrap gap-3">
-            <input
-              type="date"
-              value={filterStart}
-              onChange={(e) => setFilterStart(e.target.value)}
-              className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
-            />
-            <input
-              type="date"
-              value={filterEnd}
-              onChange={(e) => setFilterEnd(e.target.value)}
-              className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
-            />
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
-            >
-              <option value="">Todos os status</option>
-              <option value="PENDING">Pendente</option>
-              <option value="PAID">Pago</option>
-              <option value="REFUNDED">Estornado</option>
-            </select>
+          <div className="flex flex-wrap gap-3 bg-white border border-slate-200 rounded-lg p-3">
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-slate-500">De</label>
+              <input
+                type="date"
+                value={filterStart}
+                onChange={(e) => setFilterStart(e.target.value)}
+                className="flex h-9 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-slate-500">Até</label>
+              <input
+                type="date"
+                value={filterEnd}
+                onChange={(e) => setFilterEnd(e.target.value)}
+                className="flex h-9 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-slate-500">Status</label>
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="flex h-9 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+              >
+                <option value="">Todos</option>
+                <option value="PENDING">Pendente</option>
+                <option value="PAID">Pago</option>
+                <option value="REFUNDED">Estornado</option>
+              </select>
+            </div>
           </div>
 
           {loading ? (
@@ -274,13 +299,13 @@ export default function FinanceiroPage() {
             <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-slate-200 bg-slate-50">
-                    <th className="text-left px-4 py-3 text-sm font-medium text-slate-500">Paciente</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-slate-500">Médico</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-slate-500">Data</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-slate-500">Valor</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-slate-500">Método</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-slate-500">Status</th>
+                  <tr className="border-b border-slate-200 bg-slate-50/80">
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Paciente</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Médico</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Data</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Valor</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Método</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
                     <th className="px-4 py-3"></th>
                   </tr>
                 </thead>

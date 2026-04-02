@@ -115,45 +115,49 @@ export default function PatientPage() {
 return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="outline" onClick={() => router.push('/pacientes')}>
+        <Button
+          variant="outline"
+          className="border-slate-200 text-slate-600"
+          onClick={() => router.push('/pacientes')}
+        >
           ← Voltar
         </Button>
         <div>
-          <h2 className="text-2xl font-semibold text-slate-900">{patient?.name}</h2>
-          <p className="text-slate-500">Prontuário eletrônico</p>
+          <h2 className="text-2xl font-bold text-slate-900">{patient?.name}</h2>
+          <p className="text-slate-500 mt-0.5">Prontuário eletrônico</p>
         </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Dados do paciente</CardTitle>
+      <Card className="border-slate-200 shadow-sm">
+        <CardHeader className="pb-4 border-b border-slate-100">
+          <CardTitle className="text-base font-semibold text-slate-900">Dados do paciente</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-            <div>
-              <p className="text-slate-500">Telefone</p>
-              <p className="font-medium">{patient?.phone || '—'}</p>
+            <div className="bg-slate-50 rounded-lg p-3">
+              <p className="text-xs text-slate-500 mb-1">Telefone</p>
+              <p className="font-medium text-slate-900">{patient?.phone || '—'}</p>
             </div>
-            <div>
-              <p className="text-slate-500">CPF</p>
-              <p className="font-medium">{patient?.cpf || '—'}</p>
+            <div className="bg-slate-50 rounded-lg p-3">
+              <p className="text-xs text-slate-500 mb-1">CPF</p>
+              <p className="font-medium text-slate-900">{patient?.cpf || '—'}</p>
             </div>
-            <div>
-              <p className="text-slate-500">E-mail</p>
-              <p className="font-medium">{patient?.email || '—'}</p>
+            <div className="bg-slate-50 rounded-lg p-3">
+              <p className="text-xs text-slate-500 mb-1">E-mail</p>
+              <p className="font-medium text-slate-900">{patient?.email || '—'}</p>
             </div>
-            <div>
-              <p className="text-slate-500">Nascimento</p>
-              <p className="font-medium">
+            <div className="bg-slate-50 rounded-lg p-3">
+              <p className="text-xs text-slate-500 mb-1">Nascimento</p>
+              <p className="font-medium text-slate-900">
                 {patient?.birthDate
                   ? format(parseISO(patient.birthDate), 'dd/MM/yyyy')
                   : '—'}
               </p>
             </div>
             {patient?.notes && (
-              <div className="col-span-2 md:col-span-4">
-                <p className="text-slate-500">Observações</p>
-                <p className="font-medium">{patient.notes}</p>
+              <div className="col-span-2 md:col-span-4 bg-amber-50 rounded-lg p-3 border border-amber-100">
+                <p className="text-xs text-amber-600 mb-1 font-medium">⚠ Observações</p>
+                <p className="text-slate-900">{patient.notes}</p>
               </div>
             )}
           </div>
@@ -161,81 +165,45 @@ return (
       </Card>
 
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-medium text-slate-900">Histórico de atendimentos</h3>
-        <Button onClick={() => setShowForm(true)}>Novo atendimento</Button>
+        <h3 className="text-lg font-semibold text-slate-900">Histórico de atendimentos</h3>
+        <Button
+          onClick={() => setShowForm(true)}
+          className="bg-blue-600 hover:bg-blue-700"
+        >
+          + Novo atendimento
+        </Button>
       </div>
 
       {showForm && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">
+        <Card className="border-slate-200 shadow-sm">
+          <CardHeader className="pb-4 border-b border-slate-100">
+            <CardTitle className="text-base font-semibold text-slate-900">
               {editingRecord ? 'Editar atendimento' : 'Novo atendimento'}
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label>Queixa principal</Label>
-                <textarea
-                  value={form.complaint}
-                  onChange={(e) => setForm({ ...form, complaint: e.target.value })}
-                  placeholder="Descreva a queixa principal do paciente..."
-                  rows={2}
-                  className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Anamnese</Label>
-                <textarea
-                  value={form.anamnesis}
-                  onChange={(e) => setForm({ ...form, anamnesis: e.target.value })}
-                  placeholder="História da doença atual, antecedentes..."
-                  rows={3}
-                  className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Exame físico</Label>
-                <textarea
-                  value={form.physicalExam}
-                  onChange={(e) => setForm({ ...form, physicalExam: e.target.value })}
-                  placeholder="Sinais vitais, ausculta, palpação..."
-                  rows={3}
-                  className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Diagnóstico</Label>
-                <textarea
-                  value={form.diagnosis}
-                  onChange={(e) => setForm({ ...form, diagnosis: e.target.value })}
-                  placeholder="Hipótese diagnóstica, CID..."
-                  rows={2}
-                  className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Prescrição</Label>
-                <textarea
-                  value={form.prescription}
-                  onChange={(e) => setForm({ ...form, prescription: e.target.value })}
-                  placeholder="Medicamentos, dosagens, orientações..."
-                  rows={3}
-                  className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Observações</Label>
-                <textarea
-                  value={form.notes}
-                  onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                  placeholder="Retorno, encaminhamentos, outros..."
-                  rows={2}
-                  className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                />
-              </div>
-              <div className="flex gap-2">
-                <Button type="submit">
+              {[
+                { id: 'complaint', label: 'Queixa principal', placeholder: 'Descreva a queixa principal do paciente...', rows: 2 },
+                { id: 'anamnesis', label: 'Anamnese', placeholder: 'História da doença atual, antecedentes...', rows: 3 },
+                { id: 'physicalExam', label: 'Exame físico', placeholder: 'Sinais vitais, ausculta, palpação...', rows: 3 },
+                { id: 'diagnosis', label: 'Diagnóstico', placeholder: 'Hipótese diagnóstica, CID...', rows: 2 },
+                { id: 'prescription', label: 'Prescrição', placeholder: 'Medicamentos, dosagens, orientações...', rows: 3 },
+                { id: 'notes', label: 'Observações', placeholder: 'Retorno, encaminhamentos, outros...', rows: 2 },
+              ].map((field) => (
+                <div key={field.id} className="space-y-1.5">
+                  <label className="text-sm font-medium text-slate-700">{field.label}</label>
+                  <textarea
+                    value={form[field.id as keyof RecordContent] || ''}
+                    onChange={(e) => setForm({ ...form, [field.id]: e.target.value })}
+                    placeholder={field.placeholder}
+                    rows={field.rows}
+                    className="flex w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm resize-none focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+              ))}
+              <div className="flex gap-2 pt-2 border-t border-slate-100">
+                <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
                   {editingRecord ? 'Salvar alterações' : 'Salvar atendimento'}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
@@ -262,11 +230,11 @@ return (
             const content: RecordContent = JSON.parse(record.content)
             const isExpanded = expandedRecord === record.id
             return (
-              <Card key={record.id}>
+              <Card key={record.id} className="border-slate-200 shadow-sm">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium text-slate-900">
+                      <p className="font-semibold text-slate-900">
                         {format(parseISO(record.createdAt), "d 'de' MMMM 'de' yyyy 'às' HH:mm", { locale: ptBR })}
                       </p>
                       {content.diagnosis && (
@@ -274,16 +242,26 @@ return (
                       )}
                     </div>
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm" onClick={() => setExpandedRecord(isExpanded ? null : record.id)}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-slate-200 text-slate-600 text-xs"
+                        onClick={() => setExpandedRecord(isExpanded ? null : record.id)}
+                      >
                         {isExpanded ? 'Recolher' : 'Ver mais'}
                       </Button>
-                      <Button variant="outline" size="sm" onClick={() => openEdit(record)}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-slate-200 text-slate-600 text-xs"
+                        onClick={() => openEdit(record)}
+                      >
                         Editar
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
-                        className="text-red-600 hover:text-red-700"
+                        className="border-red-200 text-red-500 hover:text-red-600 text-xs"
                         onClick={() => handleDelete(record.id)}
                       >
                         Remover
@@ -292,42 +270,23 @@ return (
                   </div>
                 </CardHeader>
                 {isExpanded && (
-                  <CardContent className="pt-0 space-y-3 text-sm">
-                    {content.complaint && (
-                      <div>
-                        <p className="font-medium text-slate-700">Queixa principal</p>
-                        <p className="text-slate-600 whitespace-pre-wrap">{content.complaint}</p>
-                      </div>
-                    )}
-                    {content.anamnesis && (
-                      <div>
-                        <p className="font-medium text-slate-700">Anamnese</p>
-                        <p className="text-slate-600 whitespace-pre-wrap">{content.anamnesis}</p>
-                      </div>
-                    )}
-                    {content.physicalExam && (
-                      <div>
-                        <p className="font-medium text-slate-700">Exame físico</p>
-                        <p className="text-slate-600 whitespace-pre-wrap">{content.physicalExam}</p>
-                      </div>
-                    )}
-                    {content.diagnosis && (
-                      <div>
-                        <p className="font-medium text-slate-700">Diagnóstico</p>
-                        <p className="text-slate-600 whitespace-pre-wrap">{content.diagnosis}</p>
-                      </div>
-                    )}
-                    {content.prescription && (
-                      <div>
-                        <p className="font-medium text-slate-700">Prescrição</p>
-                        <p className="text-slate-600 whitespace-pre-wrap">{content.prescription}</p>
-                      </div>
-                    )}
-                    {content.notes && (
-                      <div>
-                        <p className="font-medium text-slate-700">Observações</p>
-                        <p className="text-slate-600 whitespace-pre-wrap">{content.notes}</p>
-                      </div>
+                  <CardContent className="pt-0 space-y-4 text-sm border-t border-slate-100">
+                    {[
+                      { key: 'complaint', label: 'Queixa principal' },
+                      { key: 'anamnesis', label: 'Anamnese' },
+                      { key: 'physicalExam', label: 'Exame físico' },
+                      { key: 'diagnosis', label: 'Diagnóstico' },
+                      { key: 'prescription', label: 'Prescrição' },
+                      { key: 'notes', label: 'Observações' },
+                    ].map(({ key, label }) =>
+                      content[key as keyof RecordContent] ? (
+                        <div key={key} className="pt-4">
+                          <p className="font-medium text-slate-700 mb-1">{label}</p>
+                          <p className="text-slate-600 whitespace-pre-wrap bg-slate-50 rounded-lg p-3">
+                            {content[key as keyof RecordContent]}
+                          </p>
+                        </div>
+                      ) : null
                     )}
                   </CardContent>
                 )}

@@ -19,6 +19,7 @@ import {
   addMinutes,
 } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import React from 'react'
 
 interface Doctor {
   id: string
@@ -188,28 +189,32 @@ export default function AgendamentosPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-semibold text-slate-900">Agendamentos</h2>
-          <p className="text-slate-500">Calendário semanal de consultas</p>
-        </div>
-        <Button onClick={() => setShowForm(true)}>Nova consulta</Button>
+    <div className="flex items-center justify-between">
+      <div>
+        <h2 className="text-2xl font-bold text-slate-900">Agendamentos</h2>
+        <p className="text-slate-500 mt-0.5">Calendário semanal de consultas</p>
       </div>
+      <Button onClick={() => setShowForm(true)} className="bg-blue-600 hover:bg-blue-700">
+        + Nova consulta
+      </Button>
+    </div>
 
       {showForm && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Nova consulta</CardTitle>
+        <Card className="border-slate-200 shadow-sm">
+          <CardHeader className="pb-4 border-b border-slate-100">
+            <CardTitle className="text-base font-semibold text-slate-900">Nova consulta</CardTitle>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+          <CardContent className="pt-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Médico</Label>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-slate-700">
+                    Médico <span className="text-red-500">*</span>
+                  </label>
                   <select
                     value={form.doctorId}
                     onChange={(e) => setForm({ ...form, doctorId: e.target.value })}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     required
                   >
                     <option value="">Selecione o médico</option>
@@ -218,12 +223,14 @@ export default function AgendamentosPage() {
                     ))}
                   </select>
                 </div>
-                <div className="space-y-2">
-                  <Label>Paciente</Label>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-slate-700">
+                    Paciente <span className="text-red-500">*</span>
+                  </label>
                   <select
                     value={form.patientId}
                     onChange={(e) => setForm({ ...form, patientId: e.target.value })}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     required
                   >
                     <option value="">Selecione o paciente</option>
@@ -232,30 +239,36 @@ export default function AgendamentosPage() {
                     ))}
                   </select>
                 </div>
-                <div className="space-y-2">
-                  <Label>Data</Label>
-                  <Input
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-slate-700">
+                    Data <span className="text-red-500">*</span>
+                  </label>
+                  <input
                     type="date"
                     value={form.date}
                     onChange={(e) => setForm({ ...form, date: e.target.value })}
                     required
+                    className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label>Horário</Label>
-                  <Input
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-slate-700">
+                    Horário <span className="text-red-500">*</span>
+                  </label>
+                  <input
                     type="time"
                     value={form.startTime}
                     onChange={(e) => setForm({ ...form, startTime: e.target.value })}
                     required
+                    className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label>Duração</Label>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-slate-700">Duração</label>
                   <select
                     value={form.duration}
                     onChange={(e) => setForm({ ...form, duration: e.target.value })}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   >
                     <option value="30">30 minutos</option>
                     <option value="45">45 minutos</option>
@@ -263,17 +276,20 @@ export default function AgendamentosPage() {
                     <option value="90">1h30</option>
                   </select>
                 </div>
-                <div className="space-y-2">
-                  <Label>Observações</Label>
-                  <Input
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-slate-700">Observações</label>
+                  <input
                     placeholder="Opcional..."
                     value={form.notes}
                     onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                    className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
               </div>
-              <div className="flex gap-2">
-                <Button type="submit">Agendar consulta</Button>
+              <div className="flex gap-2 pt-2 border-t border-slate-100">
+                <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+                  Agendar consulta
+                </Button>
                 <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
                   Cancelar
                 </Button>
@@ -284,59 +300,62 @@ export default function AgendamentosPage() {
       )}
 
       {selectedAppointment && (
-        <Card className="border-slate-300">
-          <CardHeader>
-            <CardTitle className="text-base">Detalhes da consulta</CardTitle>
+        <Card className="border-blue-200 shadow-sm">
+          <CardHeader className="pb-3 border-b border-slate-100">
+            <CardTitle className="text-base font-semibold text-slate-900">
+              Detalhes da consulta
+            </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div>
-                <p className="text-slate-500">Paciente</p>
-                <p className="font-medium">{selectedAppointment.patient.name}</p>
+          <CardContent className="pt-4 space-y-4">
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="bg-slate-50 rounded-lg p-3">
+                <p className="text-slate-500 text-xs mb-1">Paciente</p>
+                <p className="font-medium text-slate-900">{selectedAppointment.patient.name}</p>
               </div>
-              <div>
-                <p className="text-slate-500">Médico</p>
-                <p className="font-medium">{selectedAppointment.doctor.name}</p>
+              <div className="bg-slate-50 rounded-lg p-3">
+                <p className="text-slate-500 text-xs mb-1">Médico</p>
+                <p className="font-medium text-slate-900">{selectedAppointment.doctor.name}</p>
               </div>
-              <div>
-                <p className="text-slate-500">Horário</p>
-                <p className="font-medium">
+              <div className="bg-slate-50 rounded-lg p-3">
+                <p className="text-slate-500 text-xs mb-1">Horário</p>
+                <p className="font-medium text-slate-900">
                   {format(parseISO(selectedAppointment.startsAt), 'HH:mm')} -{' '}
                   {format(parseISO(selectedAppointment.endsAt), 'HH:mm')}
                 </p>
               </div>
-              <div>
-                <p className="text-slate-500">Status</p>
-                <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${STATUS_COLORS[selectedAppointment.status]}`}>
+              <div className="bg-slate-50 rounded-lg p-3">
+                <p className="text-slate-500 text-xs mb-1">Status</p>
+                <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[selectedAppointment.status]}`}>
                   {STATUS_LABELS[selectedAppointment.status]}
                 </span>
               </div>
             </div>
-            <div className="flex flex-wrap gap-2 pt-2">
-            {Object.keys(STATUS_LABELS).map((status) => (
+            <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-100">
+              {Object.keys(STATUS_LABELS).map((status) => (
+                <Button
+                  key={status}
+                  size="sm"
+                  variant="outline"
+                  className="border-slate-200 text-slate-600 hover:text-slate-900 text-xs"
+                  onClick={() => handleStatusChange(selectedAppointment.id, status)}
+                  disabled={selectedAppointment.status === status}
+                >
+                  {STATUS_LABELS[status]}
+                </Button>
+              ))}
+              {selectedAppointment.status === 'DONE' && (
+                <Button
+                  size="sm"
+                  className="bg-green-600 hover:bg-green-700 text-white text-xs"
+                  onClick={() => setShowPaymentForm(true)}
+                >
+                  Gerar cobrança
+                </Button>
+              )}
               <Button
-                key={status}
                 size="sm"
                 variant="outline"
-                onClick={() => handleStatusChange(selectedAppointment.id, status)}
-                disabled={selectedAppointment.status === status}
-              >
-                {STATUS_LABELS[status]}
-              </Button>
-            ))}
-            {selectedAppointment.status === 'DONE' && (
-              <Button
-                size="sm"
-                className="bg-green-600 hover:bg-green-700 text-white"
-                onClick={() => setShowPaymentForm(true)}
-              >
-                Gerar cobrança
-              </Button>
-            )}
-              <Button
-                size="sm"
-                variant="outline"
-                className="text-red-600 hover:text-red-700"
+                className="border-red-200 text-red-500 hover:text-red-600 text-xs"
                 onClick={() => handleDelete(selectedAppointment.id)}
               >
                 Remover
@@ -344,6 +363,7 @@ export default function AgendamentosPage() {
               <Button
                 size="sm"
                 variant="outline"
+                className="border-slate-200 text-slate-600 text-xs"
                 onClick={() => setSelectedAppointment(null)}
               >
                 Fechar
@@ -400,16 +420,26 @@ export default function AgendamentosPage() {
       )}
 
       {/* Navegação semanal */}
-      <div className="flex items-center justify-between">
-        <Button variant="outline" onClick={() => setCurrentWeek(subWeeks(currentWeek, 1))}>
-          ← Semana anterior
+      <div className="flex items-center justify-between bg-white border border-slate-200 rounded-lg px-4 py-3">
+        <Button
+          variant="outline"
+          size="sm"
+          className="border-slate-200"
+          onClick={() => setCurrentWeek(subWeeks(currentWeek, 1))}
+        >
+          ← Anterior
         </Button>
-        <p className="font-medium text-slate-700">
+        <p className="font-medium text-slate-700 text-sm">
           {format(weekStart, "d 'de' MMMM", { locale: ptBR })} -{' '}
           {format(weekEnd, "d 'de' MMMM 'de' yyyy", { locale: ptBR })}
         </p>
-        <Button variant="outline" onClick={() => setCurrentWeek(addWeeks(currentWeek, 1))}>
-          Próxima semana →
+        <Button
+          variant="outline"
+          size="sm"
+          className="border-slate-200"
+          onClick={() => setCurrentWeek(addWeeks(currentWeek, 1))}
+        >
+          Próxima →
         </Button>
       </div>
 
@@ -437,7 +467,7 @@ export default function AgendamentosPage() {
 
             {/* Linhas de horário */}
             {HOURS.map((hour) => (
-              <>
+              <React.Fragment key={`hour-${hour}`}>
                 <div key={`hour-${hour}`} className="border-b border-slate-100 p-2 text-right">
                   <span className="text-xs text-slate-400">{String(hour).padStart(2, '0')}:00</span>
                 </div>
@@ -461,7 +491,7 @@ export default function AgendamentosPage() {
                     </div>
                   )
                 })}
-              </>
+              </React.Fragment>
             ))}
           </div>
         </div>
