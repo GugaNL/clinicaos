@@ -164,7 +164,7 @@ export default function DashboardLayout({
       </div>
 
       {/* Main content */}
-      <main className="md:ml-60 pt-16 md:pt-6 p-4 md:p-8">
+      <main className="md:ml-60 p-4 md:p-8" style={{ paddingTop: '69px' }}>
         {children}
       </main>
     </div>

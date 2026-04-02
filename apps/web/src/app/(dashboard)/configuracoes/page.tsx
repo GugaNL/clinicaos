@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
 import { Settings, Users, Building2, Trash2, Plus } from 'lucide-react'
+import { IMaskInput } from 'react-imask'
 
 interface Clinic {
   id: string
@@ -118,15 +119,15 @@ export default function ConfiguracoesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
-          <Settings className="w-5 h-5 text-slate-600" />
-        </div>
-        <div>
-          <h2 className="text-2xl font-bold text-slate-900">Configurações</h2>
-          <p className="text-slate-500 mt-0.5">Gerencie sua clínica e usuários</p>
-        </div>
+    <div className="flex items-center gap-3 mt-2">
+      <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+        <Settings className="w-5 h-5 text-slate-600" />
       </div>
+      <div>
+        <h2 className="text-2xl font-bold text-slate-900">Configurações</h2>
+        <p className="text-slate-500 mt-0.5">Gerencie sua clínica e usuários</p>
+      </div>
+    </div>
 
       {/* Tabs */}
       <div className="flex gap-2 border-b border-slate-200">
@@ -184,10 +185,12 @@ export default function ConfiguracoesPage() {
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium text-slate-700">Telefone</label>
-                  <input
+                  <IMaskInput
+                    mask="(00) 00000-0000"
                     value={clinicForm.phone}
-                    onChange={(e) => setClinicForm({ ...clinicForm, phone: e.target.value })}
+                    onAccept={(value) => setClinicForm({ ...clinicForm, phone: value })}
                     placeholder="(81) 99999-9999"
+                    autoComplete="new-password"
                     className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
