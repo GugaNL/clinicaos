@@ -12,7 +12,9 @@ import {
   LogOut,
   Menu,
   X,
+  Settings
 } from 'lucide-react'
+import { GlobalSearch } from '@/components/GlobalSearch'
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -20,6 +22,7 @@ const navItems = [
   { href: '/pacientes', label: 'Pacientes', icon: Users },
   { href: '/medicos', label: 'Médicos', icon: Stethoscope },
   { href: '/financeiro', label: 'Financeiro', icon: DollarSign },
+  { href: '/configuracoes', label: 'Configurações', icon: Settings },
 ]
 
 function Sidebar({
@@ -144,9 +147,20 @@ export default function DashboardLayout({
           </div>
           <span className="font-semibold text-slate-900">ClinicaOS</span>
         </div>
+          <div className="flex-1">
+            <GlobalSearch />
+          </div>
         <button onClick={() => setSidebarOpen(!sidebarOpen)}>
           {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
+      </div>
+
+      {/* Desktop top bar */}
+      <div className="hidden md:flex fixed top-0 left-60 right-0 z-20 bg-white border-b border-slate-200 px-8 py-2 items-center justify-between">
+        <GlobalSearch />
+        <div className="flex items-center gap-2 text-xs text-slate-400">
+          <span>ClinicaOS</span>
+        </div>
       </div>
 
       {/* Main content */}

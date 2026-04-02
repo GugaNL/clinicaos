@@ -1816,7 +1816,7 @@ axe-core@^4.10.0:
 
 axios@^1.14.0:
   version "1.14.0"
-  resolved "https://registry.npmjs.org/axios/-/axios-1.14.0.tgz"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-1.14.0.tgz#7c29f4cf2ea91ef05018d5aa5399bf23ed3120eb"
   integrity sha512-3Y8yrqLSwjuzpXuZ0oIYZ/XGgLwUIBU3uLvbcpb0pidD9ctpShJd43KSlEEkVQg6DS0G9NKyzOvBfUtDKEyHvQ==
   dependencies:
     follow-redirects "^1.15.11"
