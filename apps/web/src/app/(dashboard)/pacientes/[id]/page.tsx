@@ -109,6 +109,214 @@ export default function PatientPage() {
     }
   }
 
+  async function handleExportAllPDF() {
+    if (records.length === 0) return
+    const jsPDF = (await import('jspdf')).jsPDF
+    const doc = new jsPDF()
+
+    // Cabeçalho
+    doc.setFillColor(37, 99, 235)
+    doc.rect(0, 0, 210, 40, 'F')
+
+    doc.setTextColor(255, 255, 255)
+    doc.setFontSize(18)
+    doc.setFont('helvetica', 'bold')
+    doc.text('ClinicaOS', 20, 18)
+
+    doc.setFontSize(11)
+    doc.setFont('helvetica', 'normal')
+    doc.text('Histórico Completo de Atendimentos', 20, 28)
+
+    doc.setFontSize(10)
+    doc.text(format(new Date(), "dd/MM/yyyy"), 190, 28, { align: 'right' })
+
+    // Dados do paciente
+    doc.setFillColor(241, 245, 249)
+    doc.rect(0, 40, 210, 28, 'F')
+
+    doc.setTextColor(15, 23, 42)
+    doc.setFontSize(13)
+    doc.setFont('helvetica', 'bold')
+    doc.text(patient?.name || '', 20, 54)
+
+    doc.setFontSize(9)
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(100, 116, 139)
+    const infos = [
+      patient?.phone ? `Tel: ${patient.phone}` : null,
+      patient?.cpf ? `CPF: ${patient.cpf}` : null,
+      patient?.birthDate ? `Nasc: ${format(parseISO(patient.birthDate), 'dd/MM/yyyy')}` : null,
+    ].filter(Boolean).join('   |   ')
+    doc.text(infos, 20, 63)
+
+    doc.setTextColor(100, 116, 139)
+    doc.setFontSize(9)
+    doc.text(`Total de atendimentos: ${records.length}`, 20, 72)
+
+    let y = 88
+
+    for (let i = 0; i < records.length; i++) {
+      const record = records[i]
+      const content: RecordContent = JSON.parse(record.content)
+
+      if (i > 0) {
+        doc.addPage()
+        y = 20
+      }
+
+      // Separador do atendimento
+      doc.setFillColor(37, 99, 235)
+      doc.rect(0, y - 6, 210, 14, 'F')
+
+      doc.setTextColor(255, 255, 255)
+      doc.setFontSize(10)
+      doc.setFont('helvetica', 'bold')
+      doc.text(
+        `Atendimento ${i + 1} — ${format(parseISO(record.createdAt), "dd/MM/yyyy 'às' HH:mm")}`,
+        20,
+        y + 2
+      )
+
+      y += 16
+
+      const fields = [
+        { label: 'Queixa Principal', value: content.complaint },
+        { label: 'Anamnese', value: content.anamnesis },
+        { label: 'Exame Físico', value: content.physicalExam },
+        { label: 'Diagnóstico', value: content.diagnosis },
+        { label: 'Prescrição', value: content.prescription },
+        { label: 'Observações', value: content.notes },
+      ].filter((f) => f.value)
+
+      for (const field of fields) {
+        if (y > 260) {
+          doc.addPage()
+          y = 20
+        }
+
+        doc.setTextColor(37, 99, 235)
+        doc.setFontSize(9)
+        doc.setFont('helvetica', 'bold')
+        doc.text(field.label.toUpperCase(), 20, y)
+
+        doc.setTextColor(15, 23, 42)
+        doc.setFont('helvetica', 'normal')
+        doc.setFontSize(10)
+
+        const lines = doc.splitTextToSize(field.value || '', 170)
+        doc.text(lines, 20, y + 7)
+
+        y += 10 + lines.length * 6 + 6
+
+        doc.setDrawColor(226, 232, 240)
+        doc.setLineWidth(0.3)
+        doc.line(20, y - 3, 190, y - 3)
+      }
+    }
+
+    // Rodapé na última página
+    doc.setTextColor(148, 163, 184)
+    doc.setFontSize(8)
+    doc.text('ClinicaOS — Sistema de Gestão Clínica', 105, 285, { align: 'center' })
+
+    doc.save(`historico-completo-${patient?.name?.toLowerCase().replace(/\s+/g, '-')}-${format(new Date(), 'ddMMyyyy')}.pdf`)
+  }
+
+  async function handleExportPDF(record: MedicalRecord) {
+      const jsPDF = (await import('jspdf')).jsPDF
+      const content: RecordContent = JSON.parse(record.content)
+      const doc = new jsPDF()
+
+      // Cabeçalho
+      doc.setFillColor(37, 99, 235)
+      doc.rect(0, 0, 210, 40, 'F')
+
+      doc.setTextColor(255, 255, 255)
+      doc.setFontSize(18)
+      doc.setFont('helvetica', 'bold')
+      doc.text('ClinicaOS', 20, 18)
+
+      doc.setFontSize(11)
+      doc.setFont('helvetica', 'normal')
+      doc.text('Prontuário Eletrônico', 20, 28)
+
+      doc.setFontSize(10)
+      doc.text(format(new Date(), "dd/MM/yyyy"), 190, 28, { align: 'right' })
+
+      // Dados do paciente
+      doc.setFillColor(241, 245, 249)
+      doc.rect(0, 40, 210, 28, 'F')
+
+      doc.setTextColor(15, 23, 42)
+      doc.setFontSize(13)
+      doc.setFont('helvetica', 'bold')
+      doc.text(patient?.name || '', 20, 54)
+
+      doc.setFontSize(9)
+      doc.setFont('helvetica', 'normal')
+      doc.setTextColor(100, 116, 139)
+      const infos = [
+        patient?.phone ? `Tel: ${patient.phone}` : null,
+        patient?.cpf ? `CPF: ${patient.cpf}` : null,
+        patient?.birthDate ? `Nasc: ${format(parseISO(patient.birthDate), 'dd/MM/yyyy')}` : null,
+      ].filter(Boolean).join('   |   ')
+      doc.text(infos, 20, 63)
+
+      // Data do atendimento
+      doc.setTextColor(37, 99, 235)
+      doc.setFontSize(10)
+      doc.setFont('helvetica', 'bold')
+      doc.text(`Atendimento: ${format(parseISO(record.createdAt), "dd/MM/yyyy 'às' HH:mm")}`, 20, 82)
+
+      doc.setDrawColor(37, 99, 235)
+      doc.setLineWidth(0.5)
+      doc.line(20, 85, 190, 85)
+
+      // Campos do prontuário
+      const fields = [
+        { label: 'Queixa Principal', value: content.complaint },
+        { label: 'Anamnese', value: content.anamnesis },
+        { label: 'Exame Físico', value: content.physicalExam },
+        { label: 'Diagnóstico', value: content.diagnosis },
+        { label: 'Prescrição', value: content.prescription },
+        { label: 'Observações', value: content.notes },
+      ].filter((f) => f.value)
+
+      let y = 95
+
+      for (const field of fields) {
+        if (y > 260) {
+          doc.addPage()
+          y = 20
+        }
+
+        doc.setTextColor(37, 99, 235)
+        doc.setFontSize(9)
+        doc.setFont('helvetica', 'bold')
+        doc.text(field.label.toUpperCase(), 20, y)
+
+        doc.setTextColor(15, 23, 42)
+        doc.setFont('helvetica', 'normal')
+        doc.setFontSize(10)
+
+        const lines = doc.splitTextToSize(field.value || '', 170)
+        doc.text(lines, 20, y + 7)
+
+        y += 10 + lines.length * 6 + 6
+
+        doc.setDrawColor(226, 232, 240)
+        doc.setLineWidth(0.3)
+        doc.line(20, y - 3, 190, y - 3)
+      }
+
+      // Rodapé
+      doc.setTextColor(148, 163, 184)
+      doc.setFontSize(8)
+      doc.text('ClinicaOS — Sistema de Gestão Clínica', 105, 285, { align: 'center' })
+
+      doc.save(`prontuario-${patient?.name?.toLowerCase().replace(/\s+/g, '-')}-${format(parseISO(record.createdAt), 'ddMMyyyy')}.pdf`)
+  }
+
   if (loading) return <p className="text-slate-500">Carregando...</p>
   if (!patient) return <p className="text-slate-500">Paciente não encontrado.</p>
 
@@ -166,6 +374,15 @@ return (
 
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-slate-900">Histórico de atendimentos</h3>
+        {records.length > 0 && (
+          <Button
+            variant="outline"
+            className="border-slate-200 text-slate-600"
+            onClick={handleExportAllPDF}
+          >
+            Exportar histórico PDF
+          </Button>
+        )}
         <Button
           onClick={() => setShowForm(true)}
           className="bg-blue-600 hover:bg-blue-700"
@@ -242,6 +459,14 @@ return (
                       )}
                     </div>
                     <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-slate-200 text-slate-600 text-xs"
+                        onClick={() => handleExportPDF(record)}
+                      >
+                        PDF
+                      </Button>
                       <Button
                         variant="outline"
                         size="sm"
