@@ -323,10 +323,12 @@ app.post('/:id/boleto', { preHandler: authenticate }, async (request, reply) => 
       mpPaymentId: mpResponse.id,
     })
     } catch (err: any) {
-      console.error('Erro boleto MP:', JSON.stringify(err?.cause || err?.message || err))
+      console.error('Erro boleto MP full:', JSON.stringify(err))
+      console.error('Erro boleto MP cause:', JSON.stringify(err?.cause))
+      console.error('Erro boleto MP message:', err?.message)
       return reply.status(500).send({ 
         error: 'Erro ao gerar boleto', 
-        details: err?.cause?.message || err?.message || 'internal_error'
+        details: err?.message || 'internal_error'
       })
     }
   })
