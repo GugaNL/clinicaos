@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { api } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -84,10 +85,19 @@ export default function AgendamentosPage() {
     amount: '',
     method: 'PIX',
   })
+  const searchParams = useSearchParams()
 
   const weekStart = startOfWeek(currentWeek, { weekStartsOn: 1 })
   const weekEnd = endOfWeek(currentWeek, { weekStartsOn: 1 })
   const weekDays = eachDayOfInterval({ start: weekStart, end: weekEnd })
+
+  useEffect(() => {
+  const appointmentId = searchParams.get('appointmentId')
+  if (appointmentId && appointments.length > 0) {
+    const apt = appointments.find((a) => a.id === appointmentId)
+    if (apt) setSelectedAppointment(apt)
+  }
+}, [searchParams, appointments])
 
   async function loadData() {
     setLoading(true)

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { api } from '@/lib/api'
+import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
 import { format, parseISO } from 'date-fns'
@@ -86,6 +87,7 @@ export default function DashboardPage() {
       icon: Calendar,
       color: 'text-blue-600',
       bg: 'bg-blue-50',
+      href: '/agendamentos'
     },
     {
       label: 'Pacientes',
@@ -93,6 +95,7 @@ export default function DashboardPage() {
       icon: Users,
       color: 'text-violet-600',
       bg: 'bg-violet-50',
+      href: '/pacientes',
     },
     {
       label: 'Médicos',
@@ -100,6 +103,7 @@ export default function DashboardPage() {
       icon: Stethoscope,
       color: 'text-emerald-600',
       bg: 'bg-emerald-50',
+      href: '/medicos',
     },
     {
       label: 'Receita do mês',
@@ -110,6 +114,7 @@ export default function DashboardPage() {
       icon: DollarSign,
       color: 'text-amber-600',
       bg: 'bg-amber-50',
+      href: '/financeiro',
     },
   ]
 
@@ -130,6 +135,7 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat) => (
+          <Link key={stat.label} href={stat.href}>
           <Card key={stat.label} className="border-slate-200">
             <CardContent className="pt-6">
               <div className="flex items-start justify-between">
@@ -143,6 +149,7 @@ export default function DashboardPage() {
               </div>
             </CardContent>
           </Card>
+          </Link>
         ))}
       </div>
 
@@ -162,7 +169,8 @@ export default function DashboardPage() {
           ) : (
             <div className="space-y-3">
               {summary?.nextAppointments.map((apt) => (
-                <div
+                <Link
+                  href={`/agendamentos?appointmentId=${apt.id}`}
                   key={apt.id}
                   className="flex items-center justify-between py-3 border-b border-slate-100 last:border-0"
                 >
@@ -186,7 +194,7 @@ export default function DashboardPage() {
                   <span className={`text-xs px-2 py-1 rounded-full font-medium ${STATUS_COLORS[apt.status]}`}>
                     {STATUS_LABELS[apt.status]}
                   </span>
-                </div>
+                </Link>
               ))}
             </div>
           )}
