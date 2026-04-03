@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { LoadingTable } from '@/components/LoadingSpinner'
 import { toast } from 'sonner'
 import {
   format,
@@ -420,35 +421,35 @@ export default function AgendamentosPage() {
       )}
 
       {/* Navegação semanal */}
-      <div className="flex items-center justify-between bg-white border border-slate-200 rounded-lg px-4 py-3">
+      <div className="flex items-center justify-between bg-white border border-slate-200 rounded-lg px-3 py-2 gap-2">
         <Button
           variant="outline"
           size="sm"
-          className="border-slate-200"
+          className="border-slate-200 shrink-0"
           onClick={() => setCurrentWeek(subWeeks(currentWeek, 1))}
         >
-          ← Anterior
+          ←
         </Button>
-        <p className="font-medium text-slate-700 text-sm">
-          {format(weekStart, "d 'de' MMMM", { locale: ptBR })} -{' '}
-          {format(weekEnd, "d 'de' MMMM 'de' yyyy", { locale: ptBR })}
+        <p className="font-medium text-slate-700 text-base text-center">
+          {format(weekStart, "d 'de' MMM", { locale: ptBR })} -{' '}
+          {format(weekEnd, "d 'de' MMM 'de' yyyy", { locale: ptBR })}
         </p>
         <Button
           variant="outline"
           size="sm"
-          className="border-slate-200"
+          className="border-slate-200 shrink-0"
           onClick={() => setCurrentWeek(addWeeks(currentWeek, 1))}
         >
-          Próxima →
+          →
         </Button>
       </div>
 
       {/* Calendário */}
       {loading ? (
-        <p className="text-slate-500">Carregando...</p>
+        <LoadingTable />
       ) : (
-        <div className="bg-white rounded-lg border border-slate-200 overflow-auto">
-          <div className="grid" style={{ gridTemplateColumns: '60px repeat(7, 1fr)' }}>
+        <div className="bg-white rounded-lg border border-slate-200 overflow-x-auto">
+          <div className="grid min-w-[600px]" style={{ gridTemplateColumns: '60px repeat(7, 1fr)' }}>
             {/* Header dias */}
             <div className="border-b border-slate-200" />
             {weekDays.map((day) => (

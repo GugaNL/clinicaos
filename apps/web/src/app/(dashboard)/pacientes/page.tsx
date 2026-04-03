@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { api } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { LoadingTable } from '@/components/LoadingSpinner'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
 import { FormField } from '@/components/ui/form-field'
@@ -255,7 +255,7 @@ export default function PacientesPage() {
       </div>
 
       {loading ? (
-        <p className="text-slate-500">Carregando...</p>
+        <LoadingTable />
       ) : filtered.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
@@ -270,64 +270,91 @@ export default function PacientesPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-slate-200 bg-slate-50/80">
-                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Nome</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Telefone</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">CPF</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">E-mail</th>
-                <th className="px-4 py-3"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((patient) => (
-                <tr key={patient.id} className="border-b border-slate-100 hover:bg-slate-50">
-                  <td className="px-4 py-3">
+        <>
+          {/* Desktop: tabela */}
+          <div className="hidden md:block bg-white rounded-lg border border-slate-200 overflow-hidden">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-slate-200 bg-slate-50/80">
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Nome</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Telefone</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">CPF</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">E-mail</th>
+                  <th className="px-4 py-3"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((patient) => (
+                  <tr key={patient.id} className="border-b border-slate-100 hover:bg-slate-50">
+                    <td className="px-4 py-3">
+                      <p className="font-medium text-slate-900">{patient.name}</p>
+                      {patient.birthDate && (
+                        <p className="text-xs text-slate-400">
+                          {new Date(patient.birthDate).toLocaleDateString('pt-BR')}
+                        </p>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-slate-600">{patient.phone || '—'}</td>
+                    <td className="px-4 py-3 text-sm text-slate-600">{patient.cpf || '—'}</td>
+                    <td className="px-4 py-3 text-sm text-slate-600">{patient.email || '—'}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex gap-2 justify-end">
+                        <Button variant="outline" size="sm" className="border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-300" onClick={() => router.push(`/pacientes/${patient.id}`)}>
+                          Prontuário
+                        </Button>
+                        <Button variant="outline" size="sm" className="border-slate-200 text-slate-600 hover:text-slate-900" onClick={() => openEdit(patient)}>
+                          Editar
+                        </Button>
+                        <Button variant="outline" size="sm" className="border-slate-200 text-red-500 hover:text-red-600 hover:border-red-300" onClick={() => handleDelete(patient.id)}>
+                          Remover
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile: cards */}
+          <div className="md:hidden space-y-3">
+            {filtered.map((patient) => (
+              <div key={patient.id} className="bg-white rounded-xl border border-slate-200 p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
                     <p className="font-medium text-slate-900">{patient.name}</p>
                     {patient.birthDate && (
                       <p className="text-xs text-slate-400">
                         {new Date(patient.birthDate).toLocaleDateString('pt-BR')}
                       </p>
                     )}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-slate-600">{patient.phone || '—'}</td>
-                  <td className="px-4 py-3 text-sm text-slate-600">{patient.cpf || '—'}</td>
-                  <td className="px-4 py-3 text-sm text-slate-600">{patient.email || '—'}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex gap-2 justify-end">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-300"
-                        onClick={() => router.push(`/pacientes/${patient.id}`)}
-                      >
-                        Prontuário
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="border-slate-200 text-slate-600 hover:text-slate-900"
-                        onClick={() => openEdit(patient)}
-                      >
-                        Editar
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="border-slate-200 text-red-500 hover:text-red-600 hover:border-red-300"
-                        onClick={() => handleDelete(patient.id)}
-                      >
-                        Remover
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <p className="text-xs text-slate-400">Telefone</p>
+                    <p className="text-slate-700">{patient.phone || '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-400">CPF</p>
+                    <p className="text-slate-700">{patient.cpf || '—'}</p>
+                  </div>
+                </div>
+                <div className="flex gap-2 pt-2 border-t border-slate-100">
+                  <Button variant="outline" size="sm" className="flex-1 text-xs" onClick={() => router.push(`/pacientes/${patient.id}`)}>
+                    Prontuário
+                  </Button>
+                  <Button variant="outline" size="sm" className="flex-1 text-xs" onClick={() => openEdit(patient)}>
+                    Editar
+                  </Button>
+                  <Button variant="outline" size="sm" className="text-red-500 text-xs" onClick={() => handleDelete(patient.id)}>
+                    Remover
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   )

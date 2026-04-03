@@ -87,6 +87,7 @@ export default function LoginPage() {
               <Input
                 id="slug"
                 placeholder="minha-clinica"
+                autoCapitalize="off"
                 value={form.slug}
                 onChange={(e) => setForm({ ...form, slug: e.target.value })}
                 required

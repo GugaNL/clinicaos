@@ -141,17 +141,17 @@ export default function DashboardLayout({
       </div>
 
       {/* Mobile header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-30 bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-30 bg-white border-b border-slate-200 px-4 py-2 flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center">
             <Stethoscope className="w-3.5 h-3.5 text-white" />
           </div>
-          <span className="font-semibold text-slate-900">ClinicaOS</span>
+          <span className="font-semibold text-slate-900 text-sm">ClinicaOS</span>
         </div>
-          <div className="flex-1">
-            <GlobalSearch />
-          </div>
-        <button onClick={() => setSidebarOpen(!sidebarOpen)}>
+        <div className="flex-1 min-w-0">
+          <GlobalSearch />
+        </div>
+        <button onClick={() => setSidebarOpen(!sidebarOpen)} className="shrink-0">
           {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>

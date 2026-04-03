@@ -1,9 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Image from 'next/image'
 import { api } from '@/lib/api'
 import { Button } from '@/components/ui/button'
+import { LoadingTable } from '@/components/LoadingSpinner'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
 import { DollarSign, Clock, AlertCircle } from 'lucide-react'
@@ -381,7 +381,7 @@ export default function FinanceiroPage() {
           </div>
 
           {loading ? (
-            <p className="text-slate-500">Carregando...</p>
+            <LoadingTable />
           ) : payments.length === 0 ? (
             <Card>
               <CardContent className="py-12 text-center">

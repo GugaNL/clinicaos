@@ -3,8 +3,7 @@
 import { useEffect, useState } from 'react'
 import { api } from '@/lib/api'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { LoadingTable } from '@/components/LoadingSpinner'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
 
@@ -177,7 +176,7 @@ export default function MedicosPage() {
     )}
 
       {loading ? (
-        <p className="text-slate-500">Carregando...</p>
+        <LoadingTable />
       ) : doctors.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">

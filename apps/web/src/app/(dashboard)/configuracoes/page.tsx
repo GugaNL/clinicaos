@@ -305,50 +305,70 @@ export default function ConfiguracoesPage() {
 
           <Card className="border-slate-200 shadow-sm">
             <CardContent className="pt-0">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-slate-200 bg-slate-50/80">
-                    <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Nome</th>
-                    <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">E-mail</th>
-                    <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Perfil</th>
-                    <th className="px-4 py-3"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map((user) => (
-                    <tr key={user.id} className="border-b border-slate-100 hover:bg-slate-50">
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                            <span className="text-blue-700 font-semibold text-sm">
-                              {user.name.charAt(0)}
-                            </span>
-                          </div>
-                          <p className="font-medium text-slate-900">{user.name}</p>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-slate-600">{user.email}</td>
-                      <td className="px-4 py-3">
-                        <span className={`text-xs px-2 py-1 rounded-full font-medium ${ROLE_COLORS[user.role]}`}>
-                          {ROLE_LABELS[user.role]}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex justify-end">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="border-red-200 text-red-500 hover:text-red-600"
-                            onClick={() => handleDeleteUser(user.id)}
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </Button>
-                        </div>
-                      </td>
+              {/* Desktop: tabela */}
+              <div className="hidden md:block">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-slate-200 bg-slate-50/80">
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Nome</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">E-mail</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Perfil</th>
+                      <th className="px-4 py-3"></th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {users.map((user) => (
+                      <tr key={user.id} className="border-b border-slate-100 hover:bg-slate-50">
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                              <span className="text-blue-700 font-semibold text-sm">{user.name.charAt(0)}</span>
+                            </div>
+                            <p className="font-medium text-slate-900">{user.name}</p>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-slate-600">{user.email}</td>
+                        <td className="px-4 py-3">
+                          <span className={`text-xs px-2 py-1 rounded-full font-medium ${ROLE_COLORS[user.role]}`}>
+                            {ROLE_LABELS[user.role]}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex justify-end">
+                            <Button variant="outline" size="sm" className="border-red-200 text-red-500 hover:text-red-600" onClick={() => handleDeleteUser(user.id)}>
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {/* Mobile: cards */}
+              <div className="md:hidden divide-y divide-slate-100">
+                {users.map((user) => (
+                  <div key={user.id} className="flex items-center justify-between py-3 px-4">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-9 h-9 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
+                        <span className="text-blue-700 font-semibold text-sm">{user.name.charAt(0)}</span>
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-medium text-slate-900 truncate">{user.name}</p>
+                        <p className="text-xs text-slate-400 truncate">{user.email}</p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${ROLE_COLORS[user.role]}`}>
+                            {ROLE_LABELS[user.role]}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <Button variant="outline" size="sm" className="border-red-200 text-red-500 shrink-0" onClick={() => handleDeleteUser(user.id)}>
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
         </div>
