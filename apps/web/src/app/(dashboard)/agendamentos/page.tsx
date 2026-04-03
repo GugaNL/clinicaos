@@ -85,6 +85,9 @@ export default function AgendamentosPage() {
     amount: '',
     method: 'PIX',
   })
+  const [filterDoctor, setFilterDoctor] = useState('')
+  const [filterStatus, setFilterStatus] = useState('')
+  const [filterPatient, setFilterPatient] = useState('')
   const searchParams = useSearchParams()
 
   const weekStart = startOfWeek(currentWeek, { weekStartsOn: 1 })
@@ -94,10 +97,10 @@ export default function AgendamentosPage() {
   useEffect(() => {
   const appointmentId = searchParams.get('appointmentId')
   if (appointmentId && appointments.length > 0) {
-    const apt = appointments.find((a) => a.id === appointmentId)
-    if (apt) setSelectedAppointment(apt)
-  }
-}, [searchParams, appointments])
+      const apt = appointments.find((a) => a.id === appointmentId)
+      if (apt) setSelectedAppointment(apt)
+    }
+  }, [searchParams, appointments])
 
   async function loadData() {
     setLoading(true)
@@ -194,7 +197,11 @@ export default function AgendamentosPage() {
   function getAppointmentsForDayAndHour(day: Date, hour: number) {
     return appointments.filter((apt) => {
       const aptDate = parseISO(apt.startsAt)
-      return isSameDay(aptDate, day) && aptDate.getHours() === hour
+      const matchDay = isSameDay(aptDate, day) && aptDate.getHours() === hour
+      const matchDoctor = !filterDoctor || apt.doctor.id === filterDoctor
+      const matchPatient = !filterPatient || apt.patient.id === filterPatient
+      const matchStatus = !filterStatus || apt.status === filterStatus
+      return matchDay && matchDoctor && matchPatient && matchStatus
     })
   }
 
@@ -452,6 +459,63 @@ export default function AgendamentosPage() {
         >
           →
         </Button>
+      </div>
+
+      {/* Filtros */}
+      <div className="bg-white border border-slate-200 rounded-lg p-3 flex flex-wrap gap-3 items-end">
+        <div className="space-y-1 min-w-[160px]">
+          <label className="text-xs font-medium text-slate-500">Médico</label>
+          <select
+            value={filterDoctor}
+            onChange={(e) => setFilterDoctor(e.target.value)}
+            className="flex h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+          >
+            <option value="">Todos</option>
+            {doctors.map((d) => (
+              <option key={d.id} value={d.id}>{d.name}</option>
+            ))}
+          </select>
+        </div>
+        <div className="space-y-1 min-w-[160px]">
+          <label className="text-xs font-medium text-slate-500">Paciente</label>
+          <select
+            value={filterPatient}
+            onChange={(e) => setFilterPatient(e.target.value)}
+            className="flex h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+          >
+            <option value="">Todos</option>
+            {patients.map((p) => (
+              <option key={p.id} value={p.id}>{p.name}</option>
+            ))}
+          </select>
+        </div>
+        <div className="space-y-1 min-w-[160px]">
+          <label className="text-xs font-medium text-slate-500">Status</label>
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="flex h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+          >
+            <option value="">Todos</option>
+            <option value="SCHEDULED">Agendado</option>
+            <option value="CONFIRMED">Confirmado</option>
+            <option value="CANCELLED">Cancelado</option>
+            <option value="NO_SHOW">Não compareceu</option>
+            <option value="DONE">Realizado</option>
+          </select>
+        </div>
+        {(filterDoctor || filterPatient || filterStatus) && (
+          <button
+            onClick={() => {
+              setFilterDoctor('')
+              setFilterPatient('')
+              setFilterStatus('')
+            }}
+            className="h-9 px-3 text-sm text-red-500 hover:text-red-600 border border-red-200 rounded-md hover:bg-red-50 transition-colors"
+          >
+            Limpar filtros
+          </button>
+        )}
       </div>
 
       {/* Calendário */}

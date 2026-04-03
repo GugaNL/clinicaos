@@ -372,23 +372,27 @@ return (
         </CardContent>
       </Card>
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <h3 className="text-lg font-semibold text-slate-900">Histórico de atendimentos</h3>
-        {records.length > 0 && (
+        <div className="flex gap-2 flex-wrap">
+          {records.length > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-slate-200 text-slate-600 text-xs"
+              onClick={handleExportAllPDF}
+            >
+              Exportar PDF
+            </Button>
+          )}
           <Button
-            variant="outline"
-            className="border-slate-200 text-slate-600"
-            onClick={handleExportAllPDF}
+            size="sm"
+            onClick={() => setShowForm(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-xs"
           >
-            Exportar histórico PDF
+            + Novo atendimento
           </Button>
-        )}
-        <Button
-          onClick={() => setShowForm(true)}
-          className="bg-blue-600 hover:bg-blue-700"
-        >
-          + Novo atendimento
-        </Button>
+        </div>
       </div>
 
       {showForm && (
