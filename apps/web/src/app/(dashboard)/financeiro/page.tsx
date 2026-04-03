@@ -19,6 +19,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts'
+import { IMaskInput } from 'react-imask'
 
 interface Payment {
   id: string
@@ -87,6 +88,24 @@ export default function FinanceiroPage() {
     expiresAt: string
   } | null>(null)
   const [pixLoading, setPixLoading] = useState(false)
+  const [boletoData, setBoletoData] = useState<{
+    boletoUrl: string
+    barcode: string
+    expiresAt: string
+  } | null>(null)
+  const [showBoletoForm, setShowBoletoForm] = useState(false)
+  const [selectedPaymentId, setSelectedPaymentId] = useState<string | null>(null)
+  const [boletoForm, setBoletoForm] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    cpf: '',
+    zip: '',
+    street: '',
+    number: '',
+    city: '',
+    state: '',
+  })
 
   async function loadData() {
     setLoading(true)
@@ -136,6 +155,19 @@ export default function FinanceiroPage() {
       toast.error('Erro ao gerar PIX')
     } finally {
       setPixLoading(false)
+    }
+  }
+
+  async function handleGenerateBoleto(e: React.FormEvent) {
+    e.preventDefault()
+    if (!selectedPaymentId) return
+    try {
+      const { data } = await api.post(`/payments/${selectedPaymentId}/boleto`, boletoForm)
+      setBoletoData(data)
+      setShowBoletoForm(false)
+      toast.success('Boleto gerado!')
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || 'Erro ao gerar boleto')
     }
   }
 
@@ -441,6 +473,28 @@ export default function FinanceiroPage() {
                               <Button
                                 size="sm"
                                 variant="outline"
+                                className="text-orange-600"
+                                onClick={() => {
+                                  setSelectedPaymentId(payment.id)
+                                  setBoletoForm({
+                                    firstName: payment.appointment.patient.name.split(' ')[0],
+                                    lastName: payment.appointment.patient.name.split(' ').slice(1).join(' '),
+                                    email: '',
+                                    cpf: '',
+                                    zip: '',
+                                    street: '',
+                                    number: '',
+                                    city: '',
+                                    state: '',
+                                  })
+                                  setShowBoletoForm(true)
+                                }}
+                              >
+                                Gerar Boleto
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
                                 className="text-green-600"
                                 onClick={() => handleStatusChange(payment.id, 'PAID')}
                               >
@@ -629,6 +683,176 @@ export default function FinanceiroPage() {
           </div>
         </div>
       )}
+
+      {boletoData && (
+  <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+      <div className="bg-orange-500 px-6 py-4 text-center">
+        <p className="text-white font-semibold text-lg">Boleto gerado!</p>
+        <p className="text-orange-100 text-sm mt-0.5">Copie o código ou acesse o boleto</p>
+      </div>
+      <div className="p-6 space-y-4">
+        {boletoData.expiresAt && (
+          <div className="flex items-center justify-center gap-2 text-xs text-slate-500 bg-slate-50 rounded-lg py-2">
+            <span>⏱</span>
+            <span>Vence em {format(parseISO(boletoData.expiresAt), "dd/MM/yyyy")}</span>
+          </div>
+        )}
+        {boletoData.barcode && (
+          <div className="space-y-2">
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Código de barras</p>
+            <div className="flex gap-2">
+              <div className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-600 truncate font-mono">
+                {boletoData.barcode}
+              </div>
+              <Button
+                size="sm"
+                className="bg-orange-500 hover:bg-orange-600 shrink-0"
+                onClick={() => {
+                  navigator.clipboard.writeText(boletoData.barcode)
+                  toast.success('Código copiado!')
+                }}
+              >
+                Copiar
+              </Button>
+            </div>
+          </div>
+        )}
+        {boletoData.boletoUrl && (
+          <Button
+            className="w-full bg-orange-500 hover:bg-orange-600"
+            onClick={() => window.open(boletoData.boletoUrl, '_blank')}
+          >
+            Abrir boleto PDF
+          </Button>
+        )}
+        <Button
+          variant="outline"
+          className="w-full border-slate-200"
+          onClick={() => setBoletoData(null)}
+        >
+          Fechar
+        </Button>
+      </div>
+    </div>
+  </div>
+)}
+
+      {showBoletoForm && (
+  <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+      <div className="bg-orange-500 px-6 py-4">
+        <p className="text-white font-semibold text-lg">Gerar Boleto</p>
+        <p className="text-orange-100 text-sm mt-0.5">Preencha os dados do pagador</p>
+      </div>
+      <form onSubmit={handleGenerateBoleto} className="p-6 space-y-4">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium text-slate-700">Nome</label>
+            <input
+              value={boletoForm.firstName}
+              onChange={(e) => setBoletoForm({ ...boletoForm, firstName: e.target.value })}
+              required
+              className="flex h-9 w-full rounded-md border border-slate-200 px-3 text-sm focus:outline-none focus:border-orange-500"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium text-slate-700">Sobrenome</label>
+            <input
+              value={boletoForm.lastName}
+              onChange={(e) => setBoletoForm({ ...boletoForm, lastName: e.target.value })}
+              required
+              className="flex h-9 w-full rounded-md border border-slate-200 px-3 text-sm focus:outline-none focus:border-orange-500"
+            />
+          </div>
+        </div>
+        <div className="space-y-1.5">
+          <label className="text-xs font-medium text-slate-700">E-mail</label>
+          <input
+            type="email"
+            value={boletoForm.email}
+            onChange={(e) => setBoletoForm({ ...boletoForm, email: e.target.value })}
+            required
+            className="flex h-9 w-full rounded-md border border-slate-200 px-3 text-sm focus:outline-none focus:border-orange-500"
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium text-slate-700">CPF</label>
+            <IMaskInput
+              mask="000.000.000-00"
+              value={boletoForm.cpf}
+              onAccept={(value) => setBoletoForm({ ...boletoForm, cpf: value })}
+              placeholder="000.000.000-00"
+              required
+              className="flex h-9 w-full rounded-md border border-slate-200 px-3 text-sm focus:outline-none focus:border-orange-500"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium text-slate-700">CEP</label>
+            <IMaskInput
+              mask="00000-000"
+              value={boletoForm.zip}
+              onAccept={(value) => setBoletoForm({ ...boletoForm, zip: value })}
+              placeholder="00000-000"
+              required
+              className="flex h-9 w-full rounded-md border border-slate-200 px-3 text-sm focus:outline-none focus:border-orange-500"
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-3 gap-3">
+          <div className="col-span-2 space-y-1.5">
+            <label className="text-xs font-medium text-slate-700">Rua</label>
+            <input
+              value={boletoForm.street}
+              onChange={(e) => setBoletoForm({ ...boletoForm, street: e.target.value })}
+              required
+              className="flex h-9 w-full rounded-md border border-slate-200 px-3 text-sm focus:outline-none focus:border-orange-500"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium text-slate-700">Número</label>
+            <input
+              value={boletoForm.number}
+              onChange={(e) => setBoletoForm({ ...boletoForm, number: e.target.value })}
+              required
+              className="flex h-9 w-full rounded-md border border-slate-200 px-3 text-sm focus:outline-none focus:border-orange-500"
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-3 gap-3">
+          <div className="col-span-2 space-y-1.5">
+            <label className="text-xs font-medium text-slate-700">Cidade</label>
+            <input
+              value={boletoForm.city}
+              onChange={(e) => setBoletoForm({ ...boletoForm, city: e.target.value })}
+              required
+              className="flex h-9 w-full rounded-md border border-slate-200 px-3 text-sm focus:outline-none focus:border-orange-500"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium text-slate-700">UF</label>
+            <input
+              value={boletoForm.state}
+              onChange={(e) => setBoletoForm({ ...boletoForm, state: e.target.value.toUpperCase().slice(0, 2) })}
+              placeholder="PE"
+              required
+              className="flex h-9 w-full rounded-md border border-slate-200 px-3 text-sm focus:outline-none focus:border-orange-500"
+            />
+          </div>
+        </div>
+        <div className="flex gap-2 pt-2">
+          <Button type="submit" className="flex-1 bg-orange-500 hover:bg-orange-600">
+            Gerar boleto
+          </Button>
+          <Button type="button" variant="outline" onClick={() => setShowBoletoForm(false)}>
+            Cancelar
+          </Button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
     </div>
   )
 }

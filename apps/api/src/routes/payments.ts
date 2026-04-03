@@ -248,6 +248,85 @@ export async function paymentRoutes(app: FastifyInstance) {
       }
   })
 
+  // Gerar Boleto via Mercado Pago
+app.post('/:id/boleto', { preHandler: authenticate }, async (request, reply) => {
+  const { clinicId } = request.user as { clinicId: string }
+  const { id } = request.params as { id: string }
+
+  const schema = z.object({
+    firstName: z.string(),
+    lastName: z.string(),
+    email: z.string().email(),
+    cpf: z.string(),
+    zip: z.string(),
+    street: z.string(),
+    number: z.string(),
+    city: z.string(),
+    state: z.string(),
+  })
+
+  const result = schema.safeParse(request.body)
+  if (!result.success) {
+    return reply.status(400).send({ error: 'Dados inválidos' })
+  }
+
+  const payment = await prisma.payment.findFirst({
+    where: { id, clinicId },
+    include: {
+      appointment: {
+        include: { patient: true },
+      },
+    },
+  })
+
+  if (!payment) {
+    return reply.status(404).send({ error: 'Pagamento não encontrado' })
+  }
+
+  if (payment.status === 'PAID') {
+    return reply.status(400).send({ error: 'Pagamento já realizado' })
+  }
+
+  const { firstName, lastName, email, cpf, zip, street, number, city, state } = result.data
+
+  try {
+    const mpResponse = await mpPayment.create({
+      body: {
+        transaction_amount: Number(payment.amount),
+        description: `Consulta médica - ${payment.appointment.patient.name}`,
+        payment_method_id: 'bolbradesco',
+        external_reference: payment.id,
+        payer: {
+          email,
+          first_name: firstName,
+          last_name: lastName,
+          identification: {
+            type: 'CPF',
+            number: cpf.replace(/\D/g, ''),
+          },
+          address: {
+            zip_code: zip.replace(/\D/g, ''),
+            street_name: street,
+            street_number: number,
+            neighborhood: '',
+            city,
+            federal_unit: state,
+          },
+        },
+      },
+    })
+
+    return reply.send({
+      boletoUrl: (mpResponse as any).transaction_details?.external_resource_url,
+      barcode: (mpResponse as any).barcode?.content,
+      expiresAt: mpResponse.date_of_expiration,
+      mpPaymentId: mpResponse.id,
+    })
+    } catch (err: any) {
+      return reply.status(500).send({ error: 'Erro ao gerar boleto', details: err.message })
+    }
+  })
+
   // Webhook do Mercado Pago
   app.post('/webhook/mercadopago', async (request, reply) => {
     const body = request.body as any
